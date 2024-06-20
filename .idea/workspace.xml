@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cc1d286e-50cc-43a3-907e-9c2c4d20015e" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/spring-be/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/AppConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/Comments.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/JoinService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/Post.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/UserDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/java/org/example/UserDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spring-be/src/main/resources/application.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2i8o19V6FKGQAl2C3KuLfddB72U" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/sy/Desktop/kakao/spring-be/5-aspyn-spring-be"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="애플리케이션 수준" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="cc1d286e-50cc-43a3-907e-9c2c4d20015e" name="변경" comment="" />
+      <created>1718881348026</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1718881348026</updated>
+    </task>
+    <servers />
+  </component>
+</project>
