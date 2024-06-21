@@ -1,14 +1,19 @@
 package com.example.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 
+@Service
 public class JoinService {
-    @Autowired
     private UserDAO userDAO;
 
-    // 코드 이해 필요 - 아직 이해 못함
+    @Autowired
+    public JoinService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
     public boolean registerUser(UserDTO userDTO) throws SQLException {
 
         // UserDTO를 User 객체로 변환
@@ -17,6 +22,7 @@ public class JoinService {
         user.setPassword(userDTO.getPassword());
         user.setNickname(userDTO.getNickname());
 
+        // 데이터베이스 저장 처리
         return userDAO.insertUser(user);
     }
 }

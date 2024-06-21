@@ -4,14 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
 
-@RequestMapping("/api") // 이곳으로 들어오는 API 주소를 mapping
+@RestController
 public class UserController {
-    @Autowired
     private final JoinService joinService;
 
+    @Autowired
     public UserController(JoinService joinService) {
         this.joinService = joinService;
     }
@@ -20,19 +21,22 @@ public class UserController {
     // @RequestMapping(method = RequestMethod.POST, path = "/user/join")
     @PostMapping("/user/join")
     public String join(@RequestBody UserDTO userDTO) throws SQLException {
-        boolean isJoined = joinService.registerUser(userDTO);
+        try {
+            // 회원가입 로직 작성 필요
+            if (userDTO == null) {
+                return "가입할 회원 정보가 없습니다.";
+            }
+            // 신규 회원 정보 디비에 생성
+            boolean isJoined = joinService.registerUser(userDTO);
 
-        if (isJoined) {
-            return "회원가입이 완료되었습니다.";
-        } else {
-            return "회원가입에 실패했습니다.";
+            if (isJoined) {
+                return "회원가입이 완료되었습니다.";
+            } else {
+                return "회원가입에 실패했습니다.";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // 예외 메세지 콘솔 출력
+            return "회원가입 중 오류가 발생했습니다.";
         }
-
-
-        //private UserService userService;
-        //private JoinService joinService; // 이렇게 만들면 안되나? 포스트매핑은 하나씩만 해야 하나?
-        // 모델 호출 -> 서비스
-        // 반환 값 확인
-        // 회원가입이 완료되었습니다. or 회원가입에 실패했습니다.
     }
 }
