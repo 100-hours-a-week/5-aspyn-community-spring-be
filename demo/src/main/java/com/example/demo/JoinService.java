@@ -18,11 +18,11 @@ public class JoinService {
 
         // UserDTO를 User 객체로 변환
         User user = new User();
-        user.setEmail(userDTO.getId());
+        user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
         user.setNickname(userDTO.getNickname());
 
-        // 데이터베이스 저장 처리
+        // 데이터베이스 저장 처리 후 결과 반환
         return userDAO.insertUser(user);
     }
 }
