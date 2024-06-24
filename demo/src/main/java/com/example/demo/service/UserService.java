@@ -1,19 +1,52 @@
-package com.example.demo;
+package com.example.demo.service;
 
+import com.example.demo.dao.UserDao;
+import com.example.demo.dto.User;
+import com.example.demo.dto.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class LoginService {
-    private UserDAO userDAO;
+public class UserService {
 
-    public LoginService(UserDAO userDAO){
+    private UserDao userDAO;
+
+    @Autowired
+    public UserService(UserDao userDAO) {
         this.userDAO = userDAO;
     }
 
-    public Map<String, Object> login(UserDTO userDTO) {
+    /**
+     * 회원가입
+     *
+     * @param userDTO
+     * @return boolean
+     * */
+    @Transactional
+    public boolean registerUser(UserDto userDTO) throws SQLException {
+
+        // UserDTO를 User 객체로 변환
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        user.setNickname(userDTO.getNickname());
+
+        // 데이터베이스 저장 처리 후 결과 반환
+        return userDAO.insertUser(user);
+    }
+
+    /**
+     * 로그인
+     *
+     * @param userDTO
+     * @return Map<String, Object>
+     * */
+    public Map<String, Object> login(UserDto userDTO) {
         Map<String, Object> result = new HashMap<>();
 
         // 로그인 시도 유저 정보
@@ -40,4 +73,5 @@ public class LoginService {
         }
         return result;
     }
+
 }

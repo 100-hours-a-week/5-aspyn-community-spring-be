@@ -1,20 +1,16 @@
-package com.example.demo;
+package com.example.demo.dao;
 
+import com.example.demo.dto.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 @Repository
-public class UserDAO {
+public class UserDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDAO(JdbcTemplate jdbcTemplate) {
+    public UserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -29,12 +25,12 @@ public class UserDAO {
 
     // 로그인 확인
     public User checkLogin(User user) {
-        String sql = "SELECT user_num, email, password, nickname, leave FROM user WHERE email = ?";
+        String sql = "SELECT user_num, email, password, nickname, `leave` FROM user WHERE email = ?";
 
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{user.getEmail()}, (rs, rowNum) -> {
                 User dbUser = new User(); // db에서 확인한 로그인 유저 정보
-                dbUser.setUser_num((rs.getInt("user_num")));
+                dbUser.setUser_num(rs.getInt("user_num"));
                 dbUser.setEmail(rs.getString("Email"));
                 dbUser.setPassword(rs.getString("Password"));
                 dbUser.setNickname(rs.getString("Nickname"));

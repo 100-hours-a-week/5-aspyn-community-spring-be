@@ -1,9 +1,15 @@
-package com.example.demo;
+package com.example.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.dto.User;
+import com.example.demo.dto.UserDto;
+import com.example.demo.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -11,20 +17,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
-    private final JoinService joinService;
-    private final LoginService loginService;
 
-    @Autowired
-    public UserController(JoinService joinService, LoginService loginService) {
-        this.joinService = joinService;
-        this.loginService = loginService;
-    }
+    private final UserService userService;
 
     // @PostMapping 이랑 같은 기능
     // @RequestMapping(method = RequestMethod.POST, path = "/user/join")
     @PostMapping("/join")
-    public ResponseEntity<Map<String, String>> join(@RequestBody UserDTO userDTO) throws SQLException {
+    public ResponseEntity<Map<String, String>> join(@RequestBody UserDto userDTO) throws SQLException {
         Map<String,String> response = new HashMap<>();
         try {
             // 회원가입
@@ -33,7 +34,7 @@ public class UserController {
                 return ResponseEntity.badRequest().body(response);
             }
             // 신규 회원 정보 디비에 생성
-            boolean isJoined = joinService.registerUser(userDTO);
+            boolean isJoined = userService.registerUser(userDTO);
 
             if (isJoined) {
                 response.put("message", "회원가입이 완료되었습니다.");
@@ -50,9 +51,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserDto userDTO) {
         Map<String, String> response = new HashMap<>();
-        Map<String, Object> loginResult = loginService.login(userDTO);
+        Map<String, Object> loginResult = userService.login(userDTO);
 
         if ("SUCCESS".equals(loginResult.get("status"))) {
             User user = (User) loginResult.get("user");

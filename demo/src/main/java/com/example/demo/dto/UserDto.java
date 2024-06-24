@@ -1,10 +1,10 @@
-package com.example.demo;
+package com.example.demo.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class UserDTO {
+public class UserDto {
     private String email;
     private String password;
     private String nickname;

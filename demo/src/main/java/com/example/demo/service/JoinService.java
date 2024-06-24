@@ -1,5 +1,8 @@
-package com.example.demo;
+package com.example.demo.service;
 
+import com.example.demo.dto.User;
+import com.example.demo.dao.UserDao;
+import com.example.demo.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,14 +10,14 @@ import java.sql.SQLException;
 
 @Service
 public class JoinService {
-    private UserDAO userDAO;
+    private UserDao userDAO;
 
     @Autowired
-    public JoinService(UserDAO userDAO) {
+    public JoinService(UserDao userDAO) {
         this.userDAO = userDAO;
     }
 
-    public boolean registerUser(UserDTO userDTO) throws SQLException {
+    public boolean registerUser(UserDto userDTO) throws SQLException {
 
         // UserDTO를 User 객체로 변환
         User user = new User();
