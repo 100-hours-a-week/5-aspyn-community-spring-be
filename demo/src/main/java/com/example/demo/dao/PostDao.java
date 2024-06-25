@@ -1,6 +1,8 @@
 package com.example.demo.dao;
 
+import com.example.demo.dto.Comments;
 import com.example.demo.dto.Post;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,16 +11,15 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class PostDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public PostDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
+    // 전체 게시글 조회
     public List<Post> findAllPosts() {
         String sql = "SELECT p.Id, p.title, p.text, p.`like`, p.comment, p.view, p.write_date, p.modify_date, " +
                 "p.`delete`, p.user_num, p.delete_date, u.nickname " +
@@ -33,12 +34,39 @@ public class PostDao {
         }
     }
 
-    public List<Post> getPost(Post post) {
-        String sql = "SELECT * FROM post WHERE Id = ? AND `delete` = 'N'";
+    // 특정 게시글 조회
+    public Optional<Post> getPost(int id) {
+        String sql =
+                "SELECT p.*, u.nickname, u.`leave` FROM post p" +
+                " JOIN user u ON p.user_num = u.user_num " +
+                " WHERE p.Id = ? AND p.`delete` = 'N' AND u.`leave` = 'N'";
+
+        String sql2 = "SELECT * FROM comments c JOIN user u ON c.user_num = u.user_num " +
+                " WHERE c.post_id = ? AND c.`delete`='N' AND u.`leave`='N'";
         try {
-            return jdbcTemplate.query(sql, new Object[]{post.getId()}, new PostRowMapper());
+            List<Post> posts = jdbcTemplate.query(sql, new Object[]{id}, new PostRowMapper());
+
+            if (!posts.isEmpty()) {
+                Post postResult = posts.get(0);
+                List<Comments> comments = jdbcTemplate.query(sql2, new Object[]{postResult.getId()}, (rs, rowNum) -> {
+                    Comments dbComments = new Comments();
+                    dbComments.setSeq(rs.getInt("seq"));
+                    dbComments.setPostId(rs.getInt("post_id"));
+                    dbComments.setText(rs.getString("text"));
+                    dbComments.setModifyDate(rs.getTimestamp("modify_date"));
+                    dbComments.setDelete(rs.getString("delete"));
+                    dbComments.setUserNum(rs.getInt("user_num"));
+                    dbComments.setNickname(rs.getString("nickname"));
+                    dbComments.setLeave(rs.getString("leave"));
+                    return dbComments;
+                });
+                postResult.setComments(comments); // Assuming Post has a setComments method
+                return Optional.of(postResult);
+            } else {
+                return Optional.empty();
+            }
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            return Optional.empty();
         }
     }
 

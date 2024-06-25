@@ -21,6 +21,7 @@ public class PostService {
     private final PostDao postDao;
     private final UserService userService;
 
+    // 게시글 목록 조회
     public Map<String, Object> getAllPosts() {
         Map<String, Object> result = new HashMap<>();
         List<Post> allPosts = postDao.findAllPosts();
@@ -36,13 +37,10 @@ public class PostService {
         return result;
     }
 
+    // 특정 게시글 내용 조회 (게시글+댓글)
     public Map<String, Object> getPost(int id) {
         Map<String, Object> result = new HashMap<>();
-        List<Post> allPosts = postDao.findAllPosts();
-
-        Optional<Post> postOptional = allPosts.stream()
-                .filter(post -> post.getId() == id)
-                .findFirst();
+        Optional<Post> postOptional = postDao.getPost(id);
 
         if (!postOptional.isPresent()) {
             result.put("status", "ERROR");
@@ -59,6 +57,9 @@ public class PostService {
         }
         return result;
     }
+
+    // 특정 게시글 내 댓글 조회
+
 
     //회원탈퇴
     @Transactional

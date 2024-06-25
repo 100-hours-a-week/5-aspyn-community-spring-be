@@ -10,10 +10,12 @@ import java.util.Date;
 public class Comments {
     private int seq;
     private String text;
-    private Date write_date;
-    private Date modify_date;
+    private Date writeDate;
+    private Date modifyDate;
     private String delete;
-    private int user_num;
-    private int post_id;
-    private Date delete_date;
+    private int userNum;
+    private int postId;
+    private Date deleteDate;
+    private String nickname;
+    private String leave;
 }

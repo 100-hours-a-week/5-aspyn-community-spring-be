@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class Post {
     private int user_num;
     private Date delete_date;
     private String nickname;
+    private List<Comments> comments; // 댓글 목록
 }
