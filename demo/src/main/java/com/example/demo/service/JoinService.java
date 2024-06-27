@@ -3,19 +3,16 @@ package com.example.demo.service;
 import com.example.demo.dto.User;
 import com.example.demo.dao.UserDao;
 import com.example.demo.dto.UserDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 
 @Service
+@RequiredArgsConstructor
 public class JoinService {
-    private UserDao userDAO;
-
-    @Autowired
-    public JoinService(UserDao userDAO) {
-        this.userDAO = userDAO;
-    }
+    private final UserDao userDAO;
 
     public boolean registerUser(UserDto userDTO) throws SQLException {
 

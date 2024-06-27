@@ -19,7 +19,6 @@ import java.util.Optional;
 public class PostService {
 
     private final PostDao postDao;
-    private final UserService userService;
 
     // 게시글 목록 조회
     public Map<String, Object> getAllPosts() {
@@ -58,7 +57,10 @@ public class PostService {
         return result;
     }
 
-    // 특정 게시글 내 댓글 조회
+    // 게시글 삭제
+    public boolean removePost(int id) {
+        return postDao.removePost(id);
+    }
 
 
     //회원탈퇴

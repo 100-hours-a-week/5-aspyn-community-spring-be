@@ -34,12 +34,12 @@ public class PostDao {
         }
     }
 
-    // 특정 게시글 조회
+    // 특정 게시글 및 댓글 조회
     public Optional<Post> getPost(int id) {
         String sql =
                 "SELECT p.*, u.nickname, u.`leave` FROM post p" +
                 " JOIN user u ON p.user_num = u.user_num " +
-                " WHERE p.Id = ? AND p.`delete` = 'N' AND u.`leave` = 'N'";
+                " WHERE p.Id = ? AND u.`leave` = 'N'";
 
         String sql2 = "SELECT * FROM comments c JOIN user u ON c.user_num = u.user_num " +
                 " WHERE c.post_id = ? AND c.`delete`='N' AND u.`leave`='N'";
@@ -88,5 +88,15 @@ public class PostDao {
             post.setNickname(rs.getString("nickname"));
             return post;
         }
+    }
+
+    // 게시글 삭제
+    public boolean removePost(int id) {
+        String sql = "UPDATE post SET `delete` = 'Y', delete_date = now() " +
+                " WHERE Id = ?";
+
+        int result = jdbcTemplate.update(sql,id);
+
+        return result > 0;
     }
 }
