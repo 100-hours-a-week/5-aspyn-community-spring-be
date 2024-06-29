@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dao.UserDao;
 import com.example.demo.dto.User;
 import com.example.demo.dto.UserDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,14 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
-    private UserDao userDAO;
-
-    @Autowired
-    public UserService(UserDao userDAO) {
-        this.userDAO = userDAO;
-    }
+    private final UserDao userDAO;
 
     /**
      * 회원가입
