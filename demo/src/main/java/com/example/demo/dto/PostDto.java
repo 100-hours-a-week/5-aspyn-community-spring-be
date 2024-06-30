@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter @Setter
 public class PostDto {
-    private int Id;
+    private int id;
     private String title;
     private String text;
     private int like;

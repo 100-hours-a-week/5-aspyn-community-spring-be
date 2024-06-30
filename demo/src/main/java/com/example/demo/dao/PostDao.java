@@ -19,12 +19,45 @@ public class PostDao {
 
     private final JdbcTemplate jdbcTemplate;
 
+    // post 객체에 값 삽입
+    private static class PostRowMapper implements RowMapper<Post> {
+        @Override
+        public Post mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Post post = new Post();
+            post.setId(rs.getInt("Id"));
+            post.setTitle(rs.getString("title"));
+            post.setText(rs.getString("text"));
+            post.setLike(rs.getInt("like"));
+            post.setComment(rs.getInt("comment"));
+            post.setView(rs.getInt("view"));
+            post.setWrite_date(rs.getTimestamp("write_date"));
+            post.setModify_date(rs.getTimestamp("modify_date"));
+            post.setDelete(rs.getString("delete"));
+            post.setUser_num(rs.getInt("user_num"));
+            post.setDelete_date(rs.getTimestamp("delete_date"));
+            post.setNickname(rs.getString("nickname"));
+            return post;
+        }
+    }
+
     // 전체 게시글 조회
     public List<Post> findAllPosts() {
         String sql = "SELECT p.Id, p.title, p.text, p.`like`, p.comment, p.view, p.write_date, p.modify_date, " +
                 "p.`delete`, p.user_num, p.delete_date, u.nickname " +
                 "FROM post p JOIN user u ON u.user_num = p.user_num " +
                 "WHERE p.`delete`= 'N'";
+
+        try {
+            return jdbcTemplate.query(sql, new PostRowMapper());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 특정 게시글만 조회
+    public List<Post>getOnlyPost(int id) {
+        String sql = "SELECT Id, title, text, `delete`, user_num FROM post  WHERE Id = ?";
 
         try {
             return jdbcTemplate.query(sql, new PostRowMapper());
@@ -70,24 +103,21 @@ public class PostDao {
         }
     }
 
-    private static class PostRowMapper implements RowMapper<Post> {
-        @Override
-        public Post mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Post post = new Post();
-            post.setId(rs.getInt("Id"));
-            post.setTitle(rs.getString("title"));
-            post.setText(rs.getString("text"));
-            post.setLike(rs.getInt("like"));
-            post.setComment(rs.getInt("comment"));
-            post.setView(rs.getInt("view"));
-            post.setWrite_date(rs.getTimestamp("write_date"));
-            post.setModify_date(rs.getTimestamp("modify_date"));
-            post.setDelete(rs.getString("delete"));
-            post.setUser_num(rs.getInt("user_num"));
-            post.setDelete_date(rs.getTimestamp("delete_date"));
-            post.setNickname(rs.getString("nickname"));
-            return post;
-        }
+    // 신규 게시글 작성
+    public boolean insertPost(Post post) {
+        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
+        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getUser_num());
+
+        return result > 0;
+    }
+
+    // 게시글 수정
+    public boolean modifyPost(Post post) {
+        String sql = "UPDATE post SET title = ?, text = ?, modify_date = now() " +
+                " WHERE Id = ?";
+        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getId());
+
+        return result > 0;
     }
 
     // 게시글 삭제

@@ -57,6 +57,38 @@ public class PostService {
         return result;
     }
 
+    // 특정 게시글만 불러오기
+    public List<Post> getOnlyPost(int id) {
+        return postDao.getOnlyPost(id);
+    }
+
+    // 신규 게시글 등록
+    @Transactional
+    public boolean newPost(PostDto postDto) {
+
+        //PostDto 객체를 Post 객체로 변환
+        Post post = new Post();
+        post.setId(postDto.getId());
+        post.setTitle(postDto.getTitle());
+        post.setText(postDto.getText());
+
+        return postDao.insertPost(post);
+    }
+
+    // 게시글 수정
+    public boolean modifyPost(PostDto postDto) {
+
+        //PostDto 객체를 Post 객체로 변환
+        Post post = new Post();
+        post.setId(postDto.getId());
+        post.setTitle(postDto.getTitle());
+        post.setText(postDto.getText());
+        post.setUser_num(postDto.getUser_num()); // 작성자
+
+            return postDao.modifyPost(post);
+
+    }
+
     // 게시글 삭제
     public boolean removePost(int id) {
         return postDao.removePost(id);
