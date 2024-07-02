@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class Comments {
+public class Comment {
     private int seq;
     private String text;
     private Date writeDate;

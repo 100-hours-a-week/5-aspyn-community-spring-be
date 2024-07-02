@@ -21,5 +21,5 @@ public class Post {
     private int user_num; // 작성 유저
     private Date delete_date;
     private String nickname;
-    private List<Comments> comments; // 댓글 목록
+    private List<Comment> comments; // 댓글 목록
 }

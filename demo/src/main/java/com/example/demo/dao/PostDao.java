@@ -1,6 +1,6 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.Comments;
+import com.example.demo.dto.Comment;
 import com.example.demo.dto.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -85,8 +85,8 @@ public class PostDao {
 
             if (!posts.isEmpty()) {
                 Post postResult = posts.get(0);
-                List<Comments> comments = jdbcTemplate.query(sql2, new Object[]{postResult.getId()}, (rs, rowNum) -> {
-                    Comments dbComments = new Comments();
+                List<Comment> comments = jdbcTemplate.query(sql2, new Object[]{postResult.getId()}, (rs, rowNum) -> {
+                    Comment dbComments = new Comment();
                     dbComments.setSeq(rs.getInt("seq"));
                     dbComments.setPostId(rs.getInt("post_id"));
                     dbComments.setText(rs.getString("text"));

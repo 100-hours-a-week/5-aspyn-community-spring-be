@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CmtDto;
 import com.example.demo.service.CmtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,23 @@ import java.util.Map;
 public class CmtController {
     private final CmtService cmtService;
 
-    // 댓글 작성
+    // 댓글 등록
+    @PostMapping("/edit")
+    public ResponseEntity<Map<String, Object>> newCmt(@RequestBody CmtDto cmtDto) {
+        Map<String, Object> response = new HashMap<>();
+
+        boolean newCmt = cmtService.insertCmt(cmtDto);
+
+        if (newCmt) {
+            response.put("status", "SUCCESS");
+            response.put("message", "댓글이 등록 되었습니다.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            response.put("status", "ERROR");
+            response.put("message", "댓글 등록에 실패했습니다.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     // 댓글 수정
 
