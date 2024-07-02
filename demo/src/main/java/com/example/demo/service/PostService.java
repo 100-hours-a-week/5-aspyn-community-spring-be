@@ -64,15 +64,16 @@ public class PostService {
 
     // 신규 게시글 등록
     @Transactional
-    public boolean newPost(PostDto postDto) {
+    public int newPost(PostDto postDto) {
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
-        post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
         post.setText(postDto.getText());
+        post.setUser_num(postDto.getUser_num());
 
         return postDao.insertPost(post);
+
     }
 
     // 게시글 수정

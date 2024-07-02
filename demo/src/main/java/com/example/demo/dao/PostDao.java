@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,12 +108,30 @@ public class PostDao {
     }
 
     // 신규 게시글 작성
-    public boolean insertPost(Post post) {
-        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
-        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getUser_num());
+//    public boolean insertPost(Post post) {
+//        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
+//        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getUser_num());
+//
+//        return result > 0;
+//    }
 
-        return result > 0;
+    // 신규 게시글 작성 샘플
+    public int insertPost(Post post) {
+        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, post.getTitle());
+            ps.setString(2, post.getText());
+            ps.setInt(3, post.getUser_num());
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().intValue();
+
     }
+
 
     // 게시글 수정
     public boolean modifyPost(Post post) {

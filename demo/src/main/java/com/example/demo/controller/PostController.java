@@ -40,10 +40,11 @@ public class PostController {
     public ResponseEntity<Map<String, String>> newPost(@RequestBody PostDto postDto){
         Map<String, String> response = new HashMap<>();
 
-        boolean isPosted = postService.newPost(postDto);
+        int newPostId = postService.newPost(postDto);
 
-        if(isPosted) {
+        if(newPostId > 0) {
             response.put("message", "게시글 작성이 완료되었습니다.");
+            response.put("postId", String.valueOf(newPostId));
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "게시글 작성이 실패했습니다.");
