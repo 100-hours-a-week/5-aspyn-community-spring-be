@@ -108,14 +108,6 @@ public class PostDao {
     }
 
     // 신규 게시글 작성
-//    public boolean insertPost(Post post) {
-//        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
-//        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getUser_num());
-//
-//        return result > 0;
-//    }
-
-    // 신규 게시글 작성 샘플
     public int insertPost(Post post) {
         String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -129,7 +121,6 @@ public class PostDao {
         }, keyHolder);
 
         return keyHolder.getKey().intValue();
-
     }
 
 

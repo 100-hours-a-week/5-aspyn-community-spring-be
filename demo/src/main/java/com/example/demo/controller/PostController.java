@@ -68,8 +68,6 @@ public class PostController {
             response.put("message", "게시글 수정에 실패했습니다.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
-
     }
 
     // 게시글 삭제
