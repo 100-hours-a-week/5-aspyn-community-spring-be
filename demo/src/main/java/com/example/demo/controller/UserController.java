@@ -85,6 +85,14 @@ public class UserController {
         }
     }
 
+    // 비밀번호 수정
+    @PatchMapping("/password")
+    public boolean changePassword (@RequestBody UserDto userDto) {
+        return userService.changePassword(userDto);
+    }
+
+    // 닉네임 수정
+
 //    @GetMapping("/test")
 //    public ResponseEntity<Void> test() {
 //        ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(4))

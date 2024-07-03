@@ -70,4 +70,15 @@ public class UserService {
         return result;
     }
 
+    // 비밀번호 수정
+    public boolean changePassword(UserDto userDto) {
+
+        User user = new User();
+        user.setUser_num(userDto.getUser_num());
+        user.setPassword(userDto.getPassword());
+
+        return userDAO.changePassword(user);
+    }
+
+    // 닉네임 수정
 }

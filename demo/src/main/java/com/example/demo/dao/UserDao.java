@@ -31,10 +31,10 @@ public class UserDao {
             return jdbcTemplate.queryForObject(sql, new Object[]{user.getEmail()}, (rs, rowNum) -> {
                 User dbUser = new User(); // db에서 확인한 로그인 유저 정보
                 dbUser.setUser_num(rs.getInt("user_num"));
-                dbUser.setEmail(rs.getString("Email"));
-                dbUser.setPassword(rs.getString("Password"));
-                dbUser.setNickname(rs.getString("Nickname"));
-                dbUser.setLeave(rs.getString("Leave"));
+                dbUser.setEmail(rs.getString("email"));
+                dbUser.setPassword(rs.getString("password"));
+                dbUser.setNickname(rs.getString("nickname"));
+                dbUser.setLeave(rs.getString("leave"));
                 return dbUser;
             });
         } catch (EmptyResultDataAccessException e) {
@@ -42,4 +42,14 @@ public class UserDao {
             return null;
         }
     }
+
+    // 비밀번호 수정
+    public boolean changePassword(User user) {
+        String sql = "UPDATE user SET password = ? WHERE user_num = ?";
+
+        int result = jdbcTemplate.update(sql, user.getPassword(), user.getUser_num());
+        return result > 0 ;
+    }
+
+    // 닉네임 수정
 }

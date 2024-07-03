@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Post {
-    private int Id; // 게시글 id
+    private int id; // 게시글 id
     private String title;
     private String text; // 게시글 내용
     private int like;

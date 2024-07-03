@@ -9,10 +9,10 @@ import java.util.Date;
 @Setter
 public class User {
     private int user_num;
-    private String Email;
-    private String Password;
-    private String Nickname;
-    private String Leave;
+    private String email;
+    private String password;
+    private String nickname;
+    private String leave;
     private Date join_date;
     private String leave_date;
 }
