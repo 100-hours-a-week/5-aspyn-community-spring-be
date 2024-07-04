@@ -5,6 +5,8 @@ import com.example.demo.dto.User;
 import com.example.demo.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,7 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
 
-        // 로그인 시도 이메일과 디비 정보 대조하여 데이터 가져옴
+        // 로그인 시도 이메일과 db 정보 대조하여 데이터 가져옴
         User dbUser = userDAO.checkLogin(user);
 
         if (dbUser == null) {
@@ -71,14 +73,43 @@ public class UserService {
     }
 
     // 비밀번호 수정
-    public boolean changePassword(UserDto userDto) {
+    public boolean modifyPassword(UserDto userDto) {
 
         User user = new User();
         user.setUser_num(userDto.getUser_num());
         user.setPassword(userDto.getPassword());
 
-        return userDAO.changePassword(user);
+        return userDAO.modifyPassword(user);
     }
 
     // 닉네임 수정
+    public boolean modifyNickname(UserDto userDto) {
+
+        User user = new User();
+        user.setUser_num(userDto.getUser_num());
+        user.setNickname(userDto.getNickname());
+
+        return userDAO.modifyNickname(user);
+    }
+
+    // 닉네임 중복 확인
+    public boolean checkNickname(String nickname) {
+        return userDAO.existByNickname(nickname);
+    }
+
+    // 유저 정보 조회
+    public ResponseEntity<Map<String, Object>> loginUser(int id) {
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> result = userDAO.loginUser(id);
+
+        if (result == null) {
+            response.put("message", "유저를 찾을 수 없습니다.");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } else {
+            response.put("id", result.get("user_num"));
+            response.put("email", result.get("email"));
+            response.put("nickname", result.get("nickname"));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
 }

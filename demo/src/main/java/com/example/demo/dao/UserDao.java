@@ -5,6 +5,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public class UserDao {
 
@@ -44,7 +47,7 @@ public class UserDao {
     }
 
     // 비밀번호 수정
-    public boolean changePassword(User user) {
+    public boolean modifyPassword(User user) {
         String sql = "UPDATE user SET password = ? WHERE user_num = ?";
 
         int result = jdbcTemplate.update(sql, user.getPassword(), user.getUser_num());
@@ -52,4 +55,35 @@ public class UserDao {
     }
 
     // 닉네임 수정
+    public boolean modifyNickname(User user) {
+        String sql = "UPDATE user SET nickname = ? WHERE user_num = ?";
+
+        int result = jdbcTemplate.update(sql, user.getNickname(),user.getUser_num());
+        return result > 0 ;
+    }
+
+    // 이메일 중복 확인
+
+
+    // 닉네임 중복 확인
+    public boolean existByNickname (String nickname) {
+        String sql = "SELECT nickname FROM user WHERE nickname = ? and `leave` = 'N'";
+
+        // 중복 닉네임이 존재하는지 확인
+        List<String> results = jdbcTemplate.query(
+                sql,
+                new Object[]{nickname},
+                (rs, rowNum) -> rs.getString("nickname")
+        );
+
+        // 결과가 비어있지 않으면 true(중복 있음), 비어있으면 false 반환
+        return !results.isEmpty();
+    }
+
+    // 유저 정보 조회
+    public Map<String, Object> loginUser (int id) {
+        String sql = "SELECT user_num, email, nickname FROM user WHERE user_num = ?";
+        return jdbcTemplate.queryForMap(sql, id);
+    }
+
 }

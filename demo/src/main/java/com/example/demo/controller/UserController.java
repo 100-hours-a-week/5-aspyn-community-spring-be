@@ -86,13 +86,31 @@ public class UserController {
     }
 
     // 비밀번호 수정
-    @PatchMapping("/password")
-    public boolean changePassword (@RequestBody UserDto userDto) {
-        return userService.changePassword(userDto);
+    @PatchMapping("/modifyPassword")
+    public ResponseEntity<Boolean> modifyPassword (@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.modifyPassword(userDto));
     }
 
     // 닉네임 수정
+    @PatchMapping("/modifyNickname")
+    public ResponseEntity<Boolean> modifyNickname (@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.modifyNickname(userDto));
+    }
 
+    // 닉네임 중복 확인
+    @GetMapping("/isExist/{nickname}")
+    public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
+        return ResponseEntity.ok(userService.checkNickname(nickname));
+    }
+
+    // 이메일 중복 확인
+
+    // 유저 정보 조회
+    @GetMapping("/loginUser/{id}")
+    public ResponseEntity<Map<String, Object>> loginUser(@PathVariable int id) {
+        return userService.loginUser(id);
+
+    }
 //    @GetMapping("/test")
 //    public ResponseEntity<Void> test() {
 //        ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(4))
