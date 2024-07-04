@@ -40,9 +40,11 @@ public class UserController {
             boolean isJoined = userService.registerUser(userDTO);
 
             if (isJoined) {
+                response.put("status", "SUCCESS");
                 response.put("message", "회원가입이 완료되었습니다.");
                 return ResponseEntity.ok(response);
             } else {
+                response.put("status", "ERROR");
                 response.put("message", "회원가입에 실패했습니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -51,6 +53,12 @@ public class UserController {
             response.put("message", "회원가입 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    // 이메일 중복 확인
+    @PostMapping("/isExist")
+    public ResponseEntity<Boolean> checkEmail(@RequestBody UserDto userDto) {
+        return userService.checkEmail(userDto);
     }
 
     //로그인
@@ -109,8 +117,6 @@ public class UserController {
     public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
         return ResponseEntity.ok(userService.checkNickname(nickname));
     }
-
-    // 이메일 중복 확인
 
     // 유저 정보 조회
     @GetMapping("/loginUser/{id}")

@@ -116,6 +116,15 @@ public class UserService {
         return userDAO.existByNickname(nickname);
     }
 
+    // 이메일 중복 확인
+    public ResponseEntity<Boolean>checkEmail (UserDto userDto) {
+        User user = new User();
+        user.setEmail(userDto.getEmail());
+
+        boolean usable = userDAO.checkEmail(user); // true 일시 중복 이메일 존재
+        return new ResponseEntity<>(!usable, HttpStatus.OK);
+    }
+
     // 유저 정보 조회
     public ResponseEntity<Map<String, Object>> loginUser(int id) {
         Map<String, Object> response = new HashMap<>();

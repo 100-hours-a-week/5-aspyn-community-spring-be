@@ -64,9 +64,6 @@ public class UserDao {
         return result > 0 ;
     }
 
-    // 이메일 중복 확인
-
-
     // 닉네임 중복 확인
     public boolean existByNickname (String nickname) {
         String sql = "SELECT nickname FROM user WHERE nickname = ? and `leave` = 'N'";
@@ -80,6 +77,16 @@ public class UserDao {
 
         // 결과가 비어있지 않으면 true(중복 있음), 비어있으면 false 반환
         return !results.isEmpty();
+    }
+
+    // 이메일 중복 확인
+    public boolean checkEmail (User user) {
+        // 탈퇴한 이메일 포함하여 중복 확인
+        String sql = "SELECT count(*) FROM user WHERE email = ?";
+
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{user.getEmail()}, Integer.class);
+        // 이메일 중복일 시 true
+        return count != null && count > 0;
     }
 
     // 유저 정보 조회
