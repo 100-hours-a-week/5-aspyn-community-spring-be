@@ -4,7 +4,9 @@ import com.example.demo.dto.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +86,34 @@ public class UserDao {
     public Map<String, Object> loginUser (int id) {
         String sql = "SELECT user_num, email, nickname FROM user WHERE user_num = ?";
         return jdbcTemplate.queryForMap(sql, id);
+    }
+
+    // 회원탈퇴
+    @Transactional
+    public Map<String, Object> leaveUser (User user) {
+        String sql1 = "UPDATE user SET `leave` = 'Y', leave_date = now() WHERE user_num = ?";
+        String sql2 = "UPDATE post SET `delete` = 'Y', delete_date = now() WHERE user_num = ? AND `delete`='N'";
+        String sql3 = "UPDATE comments SET `delete` = 'Y', delete_date = now() WHERE user_num = ? AND `delete` = 'N'";
+
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 유저 상태 업데이트
+            int result1 = jdbcTemplate.update(sql1, user.getUser_num());
+            // 게시글 상태 업데이트
+            int result2 = jdbcTemplate.update(sql2, user.getUser_num());
+            // 댓글 상태 업데이트
+            int result3 = jdbcTemplate.update(sql3, user.getUser_num());
+
+            result.put("status", "SUCCESS");
+            result.put("message", "회원탈퇴가 완료되었습니다.");
+        } catch (Exception e) {
+            result.put("status", "ERROR");
+            result.put("message", "회원탈퇴 처리 중 오류가 발생했습니다.");
+            result.put("error", e.getMessage());
+        }
+
+        return result;
     }
 
 }

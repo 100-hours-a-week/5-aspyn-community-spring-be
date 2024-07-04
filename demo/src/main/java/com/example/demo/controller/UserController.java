@@ -4,6 +4,7 @@ import com.example.demo.dto.User;
 import com.example.demo.dto.UserDto;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -85,6 +86,12 @@ public class UserController {
         }
     }
 
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.logout(request);
+    }
+
     // 비밀번호 수정
     @PatchMapping("/modifyPassword")
     public ResponseEntity<Boolean> modifyPassword (@RequestBody UserDto userDto) {
@@ -109,19 +116,13 @@ public class UserController {
     @GetMapping("/loginUser/{id}")
     public ResponseEntity<Map<String, Object>> loginUser(@PathVariable int id) {
         return userService.loginUser(id);
-
     }
-//    @GetMapping("/test")
-//    public ResponseEntity<Void> test() {
-//        ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(4))
-//                .path("/").httpOnly(true).maxAge(1800).build();
-//
-//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,responseCookie.toString()).build();
-//    }
-//
-//    @GetMapping("/test2")
-//    public ResponseEntity<Void> test2( HttpSession httpSession) {
-//       return ResponseEntity.ok().build();
-//    }
+
+    // 회원탈퇴
+    @DeleteMapping("/leaveUser")
+    public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
+        return userService.leaveUser(userDto, request, response);
+    }
+
 
 }

@@ -3,6 +3,10 @@ package com.example.demo.service;
 import com.example.demo.dao.UserDao;
 import com.example.demo.dto.User;
 import com.example.demo.dto.UserDto;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,6 +76,21 @@ public class UserService {
         return result;
     }
 
+    // 로그아웃
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 세션 무효화
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        result.put("status", "SUCCESS");
+        result.put("message", "로그아웃이 성공적으로 처리되었습니다.");
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     // 비밀번호 수정
     public boolean modifyPassword(UserDto userDto) {
 
@@ -110,6 +129,36 @@ public class UserService {
             response.put("email", result.get("email"));
             response.put("nickname", result.get("nickname"));
             return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+
+    // 회원탈퇴
+    public ResponseEntity<Map<String, Object>> leaveUser(UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
+        User user = new User();
+        user.setUser_num(userDto.getUser_num());
+
+        Map<String,Object> result = userDAO.leaveUser(user);
+
+        if ("SUCCESS".equals(result.get("status"))){
+            // 세션 무효화
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+
+            // 쿠키 삭제
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/"); // 필요에 따라 경로를 수정합니다.
+                    response.addCookie(cookie);
+                }
+            }
+
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(result,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
