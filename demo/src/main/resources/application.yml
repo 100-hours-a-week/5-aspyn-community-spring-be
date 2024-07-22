@@ -20,5 +20,32 @@ spring:
             hibernate:
                 dialect: org.hibernate.dialect.MySQL8Dialect
 
+    servlet:
+        multipart:
+            enabled: true
+            max-file-size: 10MB
+            max-request-size: 10MB
+
+    # Include additional secret settings
+    config:
+        import: application-secret.yml
+
 upload:
     directory: /path/to/upload/directory
+
+logging:
+    level:
+        root: DEBUG
+        org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+
+# S3
+cloud:
+    aws:
+        s3:
+            bucket: community-2024
+        region:
+            static: ap-northeast-2
+            auto: false
+        stack:
+            auto: false

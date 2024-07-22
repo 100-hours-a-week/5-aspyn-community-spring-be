@@ -10,6 +10,10 @@ import java.io.File;
 @SpringBootApplication
 public class DemoApplication {
 
+	static {
+		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");  // 추가
+	}
+
 	@Value("${upload.directory}")
 	private String uploadDirectory;
 
