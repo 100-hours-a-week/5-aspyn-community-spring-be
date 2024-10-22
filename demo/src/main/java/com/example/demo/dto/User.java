@@ -8,11 +8,11 @@ import java.util.Date;
 @Getter
 @Setter
 public class User {
-    private int user_num;
+    private int id;
     private String email;
     private String password;
     private String nickname;
-    private String leave;
-    private Date join_date;
-    private String leave_date;
+    private String profileUrl;
+    private Date createdAt;
+    private Date deletedAt;
 }

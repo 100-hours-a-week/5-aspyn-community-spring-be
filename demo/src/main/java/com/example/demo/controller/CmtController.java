@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/cmt")
+@RequestMapping("api/comment")
 public class CmtController {
     private final CmtService cmtService;
 

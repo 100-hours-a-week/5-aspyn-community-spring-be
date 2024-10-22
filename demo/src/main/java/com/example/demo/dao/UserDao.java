@@ -21,8 +21,8 @@ public class UserDao {
 
     // 회원가입
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO user (email, password, nickname) VALUES (?, ?, ?)";
-        int result = jdbcTemplate.update(sql, user.getEmail(), user.getPassword(), user.getNickname());
+        String sql = "INSERT INTO user (email, password, nickname, profileUrl) VALUES (?, ?, ?, ?)";
+        int result = jdbcTemplate.update(sql, user.getEmail(), user.getPassword(), user.getNickname(), user.getProfileUrl());
 
         // result 값이 0보다 크면(업데이트된 행이 0 초과이면) true 반환
         return result > 0;

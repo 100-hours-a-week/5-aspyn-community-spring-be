@@ -12,7 +12,7 @@ import java.util.Map;
 @RestController
 public class UserInfoController {
 
-    @GetMapping("/userinfo")
+    @GetMapping("/api/userinfo")
     public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
 
         // 세션에서 유저 정보 가져오기

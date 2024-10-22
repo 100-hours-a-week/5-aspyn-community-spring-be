@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -26,7 +26,7 @@ public class UserController {
 
     //회원가입
     // @PostMapping 이랑 같은 기능
-    // @RequestMapping(method = RequestMethod.POST, path = "/user/join")
+    // @RequestMapping(method = RequestMethod.POST, path = "api/user/join")
     @PostMapping("/join")
     public ResponseEntity<Map<String, String>> join(@RequestBody UserDto userDTO) throws SQLException {
         Map<String,String> response = new HashMap<>();
@@ -71,14 +71,14 @@ public class UserController {
             User user = (User) loginResult.get("user");
 
             // 세션에 유저 정보 저장
-            session.setAttribute("user_num", user.getUser_num());
+            session.setAttribute("user_num", user.getId());
 
             response.put("message", "로그인이 완료되었습니다.");
             response.put("status", "SUCCESS");
-            response.put("userId", String.valueOf(user.getUser_num()));
+            response.put("userId", String.valueOf(user.getId()));
 
             // 쿠키에 유저 ID 저장
-            ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(user.getUser_num()))
+            ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(user.getId()))
                     .path("/")
                     .httpOnly(true)
                     .maxAge(1800)
@@ -96,7 +96,7 @@ public class UserController {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletRespzonse response) {
         return userService.logout(request);
     }
 

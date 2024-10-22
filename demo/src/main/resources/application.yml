@@ -5,12 +5,8 @@ spring:
     output:
         ansi:
             enabled: always
-
-    datasource:
-        url: jdbc:mysql://localhost:3306/community_db
-        username: tina
-        password: qwer1234
-        driver-class-name: com.mysql.cj.jdbc.Driver
+    mvc:
+        static-path-pattern: /static/**
 
     jpa:
         hibernate:
