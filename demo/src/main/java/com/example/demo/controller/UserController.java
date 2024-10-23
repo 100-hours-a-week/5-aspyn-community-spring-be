@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.User;
+import com.example.demo.entitiy.User;
 import com.example.demo.dto.UserDto;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,7 +78,7 @@ public class UserController {
             response.put("userId", String.valueOf(user.getId()));
 
             // 쿠키에 유저 ID 저장
-            ResponseCookie responseCookie = ResponseCookie.from("user_num", String.valueOf(user.getId()))
+            ResponseCookie responseCookie = ResponseCookie.from("user_id", String.valueOf(user.getId()))
                     .path("/")
                     .httpOnly(true)
                     .maxAge(1800)
@@ -94,11 +94,11 @@ public class UserController {
         }
     }
 
-    // 로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletRespzonse response) {
-        return userService.logout(request);
-    }
+//    // 로그아웃
+//    @PostMapping("/logout")
+//    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletRespzonse response) {
+//        return userService.logout(request);
+//    }
 
     // 비밀번호 수정
     @PatchMapping("/modifyPassword")

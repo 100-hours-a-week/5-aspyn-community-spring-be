@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.dao.PostDao;
-import com.example.demo.dto.Post;
 import com.example.demo.dto.PostDto;
 import com.example.demo.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j

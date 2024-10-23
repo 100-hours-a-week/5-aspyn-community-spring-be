@@ -1,6 +1,8 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.User;
+import com.example.demo.dto.UserResponseDto;
+import com.example.demo.entitiy.User;
+import com.example.demo.dto.UserDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -29,18 +31,18 @@ public class UserDao {
     }
 
     // 로그인 확인
-    public User checkLogin(User user) {
+    public User checkLogin(UserDto userDto) {
         String sql = "SELECT id, email, password, nickname, profile_url, deleted_at FROM user WHERE email = ?";
 
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{user.getEmail()}, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userDto.getEmail()}, (rs, rowNum) -> {
                 User dbUser = new User(); // db에서 확인한 로그인 유저 정보
                 dbUser.setId(rs.getInt("id"));
                 dbUser.setEmail(rs.getString("email"));
                 dbUser.setPassword(rs.getString("password"));
                 dbUser.setNickname(rs.getString("nickname"));
-                dbUser.setProfileUrl(rs.getString("profileUrl"));
-                dbUser.setDeletedAt(rs.getDate("deletedAt"));
+                dbUser.setProfileUrl(rs.getString("profile_url"));
+                dbUser.setDeletedAt(rs.getTimestamp("deleted_at"));
                 return dbUser;
             });
         } catch (EmptyResultDataAccessException e) {

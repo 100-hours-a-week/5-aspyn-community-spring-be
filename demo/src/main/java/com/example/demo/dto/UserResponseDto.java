@@ -3,16 +3,14 @@ package com.example.demo.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class User {
+@Getter @Setter
+public class UserResponseDto {
     private long id;
     private String email;
     private String password;
     private String nickname;
     private String profileUrl;
-    private Date createdAt;
-    private Date deletedAt;
+    private LocalDateTime deletedAt;
 }

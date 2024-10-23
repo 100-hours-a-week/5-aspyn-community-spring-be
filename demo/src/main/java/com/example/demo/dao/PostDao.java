@@ -1,7 +1,7 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.Comment;
-import com.example.demo.dto.Post;
+import com.example.demo.entitiy.Comment;
+import com.example.demo.entitiy.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -1,16 +1,10 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.Comment;
-import com.example.demo.dto.Post;
+import com.example.demo.entitiy.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Repository

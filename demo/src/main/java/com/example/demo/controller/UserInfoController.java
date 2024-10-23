@@ -16,7 +16,7 @@ public class UserInfoController {
     public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
 
         // 세션에서 유저 정보 가져오기
-        String userId = session.getAttribute("user_num").toString();
+        String userId = session.getAttribute("user_id").toString();
 
         if (userId != null) {
             Map<String, String> response = new HashMap<>();

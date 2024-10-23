@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.PostDao;
-import com.example.demo.dto.Post;
+import com.example.demo.entitiy.Post;
 import com.example.demo.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
