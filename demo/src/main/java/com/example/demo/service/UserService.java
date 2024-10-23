@@ -58,11 +58,12 @@ public class UserService {
 
         // 로그인 시도 이메일과 db 정보 대조하여 데이터 가져옴
         User dbUser = userDAO.checkLogin(user);
-
+        // TODO: 비밀번호 검증 수정 필요
+        //  해시 알고리즘 사용 또는 다른 방법
         if (dbUser == null) {
             result.put("status", "ERROR");
             result.put("message", "존재하지 않는 이메일입니다.");
-        } else if (dbUser.getLeave().equals("Y")){
+        } else if (dbUser.getDeletedAt() != null) {
             result.put("status", "ERROR");
             result.put("message", "탈퇴한 계정입니다.");
         } else if (!dbUser.getPassword().equals(user.getPassword())){
@@ -95,7 +96,7 @@ public class UserService {
     public boolean modifyPassword(UserDto userDto) {
 
         User user = new User();
-        user.setUser_num(userDto.getUser_num());
+        user.setId(userDto.getId());
         user.setPassword(userDto.getPassword());
 
         return userDAO.modifyPassword(user);
@@ -105,7 +106,7 @@ public class UserService {
     public boolean modifyNickname(UserDto userDto) {
 
         User user = new User();
-        user.setUser_num(userDto.getUser_num());
+        user.setId(userDto.getId());
         user.setNickname(userDto.getNickname());
 
         return userDAO.modifyNickname(user);
@@ -144,7 +145,7 @@ public class UserService {
     // 회원탈퇴
     public ResponseEntity<Map<String, Object>> leaveUser(UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
         User user = new User();
-        user.setUser_num(userDto.getUser_num());
+        user.setId(userDto.getId());
 
         Map<String,Object> result = userDAO.leaveUser(user);
 

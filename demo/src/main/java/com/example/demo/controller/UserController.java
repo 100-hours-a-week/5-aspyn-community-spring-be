@@ -71,7 +71,7 @@ public class UserController {
             User user = (User) loginResult.get("user");
 
             // 세션에 유저 정보 저장
-            session.setAttribute("user_num", user.getId());
+            session.setAttribute("user_id", user.getId());
 
             response.put("message", "로그인이 완료되었습니다.");
             response.put("status", "SUCCESS");

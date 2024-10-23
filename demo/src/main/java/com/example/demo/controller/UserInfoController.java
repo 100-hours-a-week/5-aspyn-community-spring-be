@@ -16,11 +16,11 @@ public class UserInfoController {
     public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
 
         // 세션에서 유저 정보 가져오기
-        String user_num = session.getAttribute("user_num").toString();
+        String userId = session.getAttribute("user_num").toString();
 
-        if (user_num != null) {
+        if (userId != null) {
             Map<String, String> response = new HashMap<>();
-            response.put("user_num", user_num);
+            response.put("user_id", userId);
 
             return ResponseEntity.ok(response);
         } else {
