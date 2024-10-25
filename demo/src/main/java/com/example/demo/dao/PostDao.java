@@ -62,7 +62,7 @@ public class PostDao {
     }
 
     // 특정 게시글만 조회
-    public List<Post>getOnlyPost(int id) {
+    public List<Post> getOnlyPost(long id) {
         String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id FROM post  WHERE id = ?";
 
         try {
@@ -74,7 +74,7 @@ public class PostDao {
     }
 
     // 특정 게시글 및 댓글 조회
-    public Optional<Post> getPost(int id) {
+    public Optional<Post> getPost(long id) {
         String sql =
                 "SELECT p.*, u.nickname, u.deleted_at FROM post p" +
                 " JOIN user u ON p.user_id = u.id " +
@@ -134,13 +134,13 @@ public class PostDao {
         String sql = "UPDATE post SET title = ?, text = ?, img_url = ?, iris = ?, shutter_speed = ?, iso = ? " +
                 " WHERE id = ?";
         int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getImgUrl(),
-                post.getIris(), post.getShutterSpeed(), post.getIso(),post.getId());
+                post.getIris(), post.getShutterSpeed(), post.getIso(), post.getId());
 
         return result > 0;
     }
 
     // 게시글 삭제
-    public boolean removePost(int id) {
+    public boolean removePost(long id) {
         String sql = "UPDATE post SET deleted_at = now() WHERE id = ?";
 
         int result = jdbcTemplate.update(sql,id);

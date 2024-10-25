@@ -17,6 +17,7 @@ public class Post {
     private String shutterSpeed; // 셔터스피드
     private int iso; // 감도
     private Timestamp updatedAt;
+    private Timestamp deletedAt;
     private long userId; // 작성 유저
     private String nickname;
     private String profileUrl;

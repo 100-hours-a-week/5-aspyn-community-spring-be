@@ -28,7 +28,7 @@ public class PostService {
         log.debug("#### 게시글 목록 조회");
         if (allPosts == null) {
             result.put("status", "ERROR");
-            result.put("message", "게시글 조회중 오류가 발생하였습니다.");
+            result.put("message", "게시글 조회 중 오류가 발생하였습니다.");
         } else {
             result.put("status", "SUCCESS");
             result.put("data", postDao.findAllPosts());
@@ -37,7 +37,7 @@ public class PostService {
     }
 
     // 특정 게시글 내용 조회 (게시글+댓글)
-    public Map<String, Object> getPost(int id) {
+    public Map<String, Object> getPost(long id) {
         Map<String, Object> result = new HashMap<>();
         Optional<Post> postOptional = postDao.getPost(id);
 
@@ -46,7 +46,7 @@ public class PostService {
             result.put("message", "게시글이 존재하지 않습니다.");
         } else {
             Post dbPost = postOptional.get();
-            if ("Y".equals(dbPost.getDelete())) {
+            if (dbPost.getDeletedAt() != null) {
                 result.put("status", "ERROR");
                 result.put("message", "삭제된 게시글입니다.");
             } else {
@@ -58,7 +58,7 @@ public class PostService {
     }
 
     // 특정 게시글만 불러오기
-    public List<Post> getOnlyPost(int id) {
+    public List<Post> getOnlyPost(long id) {
         return postDao.getOnlyPost(id);
     }
 
@@ -70,7 +70,7 @@ public class PostService {
         Post post = new Post();
         post.setTitle(postDto.getTitle());
         post.setText(postDto.getText());
-        post.setUser_num(postDto.getUser_num());
+        post.setUserId(postDto.getUserId());
 
         return postDao.insertPost(post);
 
@@ -79,19 +79,31 @@ public class PostService {
     // 게시글 수정
     public boolean modifyPost(PostDto postDto) {
 
+        long userId = postDto.getUserId();
+        List<Post> prePost = postDao.getOnlyPost(postDto.getId());
+        long postWriter = prePost.get(0).getUserId();
+
+        if (userId != postWriter) {
+            return false;
+        }
+
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
         post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
         post.setText(postDto.getText());
-        post.setUser_num(postDto.getUser_num()); // 작성자
+        post.setImgUrl(postDto.getImgUrl());
+        post.setIris(postDto.getIris());
+        post.setShutterSpeed(postDto.getShutterSpeed());
+        post.setIso(postDto.getIso());
+        post.setUserId(postDto.getUserId()); // 작성자
 
             return postDao.modifyPost(post);
 
     }
 
     // 게시글 삭제
-    public boolean removePost(int id) {
+    public boolean removePost(long id) {
         return postDao.removePost(id);
     }
 
