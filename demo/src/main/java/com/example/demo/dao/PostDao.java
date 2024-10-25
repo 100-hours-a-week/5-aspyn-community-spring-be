@@ -28,28 +28,30 @@ public class PostDao {
         @Override
         public Post mapRow(ResultSet rs, int rowNum) throws SQLException {
             Post post = new Post();
-            post.setId(rs.getInt("Id"));
+            post.setId(rs.getInt("id"));
             post.setTitle(rs.getString("title"));
             post.setText(rs.getString("text"));
-            post.setLike(rs.getInt("like"));
-            post.setComment(rs.getInt("comment"));
-            post.setView(rs.getInt("view"));
-            post.setWrite_date(rs.getTimestamp("write_date"));
-            post.setModify_date(rs.getTimestamp("modify_date"));
-            post.setDelete(rs.getString("delete"));
-            post.setUser_num(rs.getInt("user_num"));
-            post.setDelete_date(rs.getTimestamp("delete_date"));
+            post.setImgUrl(rs.getString("img_url"));
+            post.setIris(rs.getString("iris"));
+            post.setShutterSpeed(rs.getString("shutter_speed"));
+            post.setIso(rs.getInt("iso"));
+            post.setUpdatedAt(rs.getTimestamp("updated_at"));
+            post.setUserId(rs.getInt("user_id"));
             post.setNickname(rs.getString("nickname"));
+            post.setProfileUrl(rs.getString("profile_url"));
             return post;
         }
     }
 
     // 전체 게시글 조회
     public List<Post> findAllPosts() {
-        String sql = "SELECT p.Id, p.title, p.text, p.`like`, p.comment, p.view, p.write_date, p.modify_date, " +
-                "p.`delete`, p.user_num, p.delete_date, u.nickname " +
-                "FROM post p JOIN user u ON u.user_num = p.user_num " +
-                "WHERE p.`delete`= 'N'";
+        String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, " +
+                "p.updated_at, p.user_id, u.nickname, u.profile_url " +
+                "FROM post p JOIN user u ON u.id = p.user_id " +
+                "WHERE p.delete_at IS NULL";
+//        String sql2 = "SELECT p.*, u.nickname, u.profile_url " +
+//                "FROM post p JOIN user u ON u.id = p.user_id " +
+//                "WHERE p.delete_at IS NULL";
 
         try {
             return jdbcTemplate.query(sql, new PostRowMapper());
@@ -61,7 +63,7 @@ public class PostDao {
 
     // 특정 게시글만 조회
     public List<Post>getOnlyPost(int id) {
-        String sql = "SELECT Id, title, text, `delete`, user_num FROM post  WHERE Id = ?";
+        String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id FROM post  WHERE id = ?";
 
         try {
             return jdbcTemplate.query(sql, new PostRowMapper());
@@ -74,12 +76,12 @@ public class PostDao {
     // 특정 게시글 및 댓글 조회
     public Optional<Post> getPost(int id) {
         String sql =
-                "SELECT p.*, u.nickname, u.`leave` FROM post p" +
-                " JOIN user u ON p.user_num = u.user_num " +
-                " WHERE p.Id = ? AND u.`leave` = 'N'";
+                "SELECT p.*, u.nickname, u.deleted_at FROM post p" +
+                " JOIN user u ON p.user_id = u.id " +
+                " WHERE p.id = ? AND u.deleted_at IS NULL";
 
-        String sql2 = "SELECT * FROM comments c JOIN user u ON c.user_num = u.user_num " +
-                " WHERE c.post_id = ? AND c.`delete`='N' AND u.`leave`='N'";
+        String sql2 = "SELECT * FROM comments c JOIN user u ON c.user_id = u.id " +
+                " WHERE c.post_id = ? AND c.deleted_at IS NULL AND u.deleted_at IS NULL";
         try {
             List<Post> posts = jdbcTemplate.query(sql, new Object[]{id}, new PostRowMapper());
 
@@ -87,17 +89,17 @@ public class PostDao {
                 Post postResult = posts.get(0);
                 List<Comment> comments = jdbcTemplate.query(sql2, new Object[]{postResult.getId()}, (rs, rowNum) -> {
                     Comment dbComments = new Comment();
-                    dbComments.setSeq(rs.getInt("seq"));
-                    dbComments.setPostId(rs.getInt("post_id"));
+                    dbComments.setId(rs.getLong("id"));
                     dbComments.setText(rs.getString("text"));
-                    dbComments.setModifyDate(rs.getTimestamp("modify_date"));
-                    dbComments.setDelete(rs.getString("delete"));
-                    dbComments.setUserNum(rs.getInt("user_num"));
+                    dbComments.setPostId(rs.getLong("post_id"));
+                    dbComments.setUserId(rs.getLong("user_id"));
+                    dbComments.setUpdatedAt(rs.getTimestamp("updated_at"));
                     dbComments.setNickname(rs.getString("nickname"));
-                    dbComments.setLeave(rs.getString("leave"));
+                    dbComments.setProfileUrl(rs.getString("profile_url"));
+                    dbComments.setUserDeletedAt(rs.getTimestamp("deleted_at"));
                     return dbComments;
                 });
-                postResult.setComments(comments); // Assuming Post has a setComments method
+                postResult.setComments(comments);
                 return Optional.of(postResult);
             } else {
                 return Optional.empty();
@@ -109,34 +111,37 @@ public class PostDao {
 
     // 신규 게시글 작성
     public int insertPost(Post post) {
-        String sql = "INSERT INTO post (title, text, user_num) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO post (title, text, img_url, user_id, iris, shutterSpeed, iso) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, post.getTitle());
             ps.setString(2, post.getText());
-            ps.setInt(3, post.getUser_num());
+            ps.setString(3, post.getImgUrl());
+            ps.setLong(4, post.getUserId());
+            ps.setString(5, post.getIris());
+            ps.setString(6, post.getShutterSpeed());
+            ps.setInt(7, post.getIso());
             return ps;
         }, keyHolder);
-
         return keyHolder.getKey().intValue();
     }
 
 
     // 게시글 수정
     public boolean modifyPost(Post post) {
-        String sql = "UPDATE post SET title = ?, text = ?, modify_date = now() " +
-                " WHERE Id = ?";
-        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getId());
+        String sql = "UPDATE post SET title = ?, text = ?, img_url = ?, iris = ?, shutter_speed = ?, iso = ? " +
+                " WHERE id = ?";
+        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getImgUrl(),
+                post.getIris(), post.getShutterSpeed(), post.getIso(),post.getId());
 
         return result > 0;
     }
 
     // 게시글 삭제
     public boolean removePost(int id) {
-        String sql = "UPDATE post SET `delete` = 'Y', delete_date = now() " +
-                " WHERE Id = ?";
+        String sql = "UPDATE post SET deleted_at = now() WHERE id = ?";
 
         int result = jdbcTemplate.update(sql,id);
 
