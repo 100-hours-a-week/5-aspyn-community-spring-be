@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.UserDao;
 import com.example.demo.entitiy.User;
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.UserRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,17 +25,17 @@ public class UserService {
     /**
      * 회원가입
      *
-     * @param userDTO
+     * @param userRequestDTO
      * @return boolean
      * */
     @Transactional
-    public boolean registerUser(UserDto userDTO) throws SQLException {
+    public boolean registerUser(UserRequestDto userRequestDTO) throws SQLException {
 
         // UserDTO를 User 객체로 변환
         User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
-        user.setNickname(userDTO.getNickname());
+        user.setEmail(userRequestDTO.getEmail());
+        user.setPassword(userRequestDTO.getPassword());
+        user.setNickname(userRequestDTO.getNickname());
 
         // 데이터베이스 저장 처리 후 결과 반환
         return userDAO.insertUser(user);
@@ -44,14 +44,14 @@ public class UserService {
     /**
      * 로그인
      *
-     * @param userDTO
+     * @param userRequestDTO
      * @return Map<String, Object>
      * */
-    public Map<String, Object> login(UserDto userDTO) {
+    public Map<String, Object> login(UserRequestDto userRequestDTO) {
         Map<String, Object> result = new HashMap<>();
 
         // 로그인 시도 이메일과 db 정보 대조하여 데이터 가져옴
-        User dbUser = userDAO.checkLogin(userDTO);
+        User dbUser = userDAO.checkLogin(userRequestDTO);
         // TODO: 비밀번호 검증 수정 필요
         //  해시 알고리즘 사용 또는 다른 방법
         if (dbUser == null) {
@@ -60,7 +60,7 @@ public class UserService {
         } else if (dbUser.getDeletedAt() != null) {
             result.put("status", "ERROR");
             result.put("message", "탈퇴한 계정입니다.");
-        } else if (!dbUser.getPassword().equals(userDTO.getPassword())){
+        } else if (!dbUser.getPassword().equals(userRequestDTO.getPassword())){
             result.put("status", "ERROR");
             result.put("message", "비밀번호가 일치하지 않습니다.");
         } else {
@@ -87,21 +87,21 @@ public class UserService {
     }
 
     // 비밀번호 수정
-    public boolean modifyPassword(UserDto userDto) {
+    public boolean modifyPassword(UserRequestDto userRequestDto) {
 
         User user = new User();
-        user.setId(userDto.getId());
-        user.setPassword(userDto.getPassword());
+        user.setId(userRequestDto.getId());
+        user.setPassword(userRequestDto.getPassword());
 
         return userDAO.modifyPassword(user);
     }
 
     // 닉네임 수정
-    public boolean modifyNickname(UserDto userDto) {
+    public boolean modifyNickname(UserRequestDto userRequestDto) {
 
         User user = new User();
-        user.setId(userDto.getId());
-        user.setNickname(userDto.getNickname());
+        user.setId(userRequestDto.getId());
+        user.setNickname(userRequestDto.getNickname());
 
         return userDAO.modifyNickname(user);
     }
@@ -112,11 +112,11 @@ public class UserService {
     }
 
     // 이메일 중복 확인
-    public ResponseEntity<Boolean>checkEmail (UserDto userDto) {
-        User user = new User();
-        user.setEmail(userDto.getEmail());
+    public ResponseEntity<Boolean>checkEmail (UserRequestDto userRequestDto) {
 
-        boolean usable = userDAO.checkEmail(user); // true 일시 중복 이메일 존재
+        String email = userRequestDto.getEmail();
+
+        boolean usable = userDAO.checkEmail(email); // true 일시 중복 이메일 존재
         return new ResponseEntity<>(!usable, HttpStatus.OK);
     }
 
@@ -137,9 +137,9 @@ public class UserService {
     }
 
     // 회원탈퇴
-    public ResponseEntity<Map<String, Object>> leaveUser(UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> leaveUser(UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
         User user = new User();
-        user.setId(userDto.getId());
+        user.setId(userRequestDto.getId());
 
         Map<String,Object> result = userDAO.leaveUser(user);
 

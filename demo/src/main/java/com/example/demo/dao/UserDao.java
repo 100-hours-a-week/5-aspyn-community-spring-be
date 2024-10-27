@@ -1,8 +1,7 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.UserResponseDto;
 import com.example.demo.entitiy.User;
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.UserRequestDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -31,11 +30,11 @@ public class UserDao {
     }
 
     // 로그인 확인
-    public User checkLogin(UserDto userDto) {
+    public User checkLogin(UserRequestDto userRequestDto) {
         String sql = "SELECT id, email, password, nickname, profile_url, deleted_at FROM user WHERE email = ?";
 
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{userDto.getEmail()}, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, new Object[]{userRequestDto.getEmail()}, (rs, rowNum) -> {
                 User dbUser = new User(); // db에서 확인한 로그인 유저 정보
                 dbUser.setId(rs.getInt("id"));
                 dbUser.setEmail(rs.getString("email"));
@@ -83,11 +82,11 @@ public class UserDao {
     }
 
     // 이메일 중복 확인
-    public boolean checkEmail (User user) {
+    public boolean checkEmail (String email) {
         // 탈퇴한 이메일 포함하여 중복 확인
         String sql = "SELECT count(*) FROM user WHERE email = ?";
 
-        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{user.getEmail()}, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{email}, Integer.class);
         // 이메일 중복일 시 true
         return count != null && count > 0;
     }

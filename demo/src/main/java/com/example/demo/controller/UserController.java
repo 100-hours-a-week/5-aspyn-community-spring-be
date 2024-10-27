@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entitiy.User;
-import com.example.demo.dto.UserDto;
+import com.example.demo.dto.UserRequestDto;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,16 +28,16 @@ public class UserController {
     // @PostMapping 이랑 같은 기능
     // @RequestMapping(method = RequestMethod.POST, path = "api/user/join")
     @PostMapping("/join")
-    public ResponseEntity<Map<String, String>> join(@RequestBody UserDto userDTO) throws SQLException {
+    public ResponseEntity<Map<String, String>> join(@RequestBody UserRequestDto userRequestDTO) throws SQLException {
         Map<String,String> response = new HashMap<>();
         try {
             // 회원가입
-            if (userDTO == null) {
+            if (userRequestDTO == null) {
                 response.put("message", "가입할 회원 정보가 없습니다.");
                 return ResponseEntity.badRequest().body(response);
             }
             // 신규 회원 정보 디비에 생성
-            boolean isJoined = userService.registerUser(userDTO);
+            boolean isJoined = userService.registerUser(userRequestDTO);
 
             if (isJoined) {
                 response.put("status", "SUCCESS");
@@ -57,15 +57,15 @@ public class UserController {
 
     // 이메일 중복 확인
     @PostMapping("/isExist")
-    public ResponseEntity<Boolean> checkEmail(@RequestBody UserDto userDto) {
-        return userService.checkEmail(userDto);
+    public ResponseEntity<Boolean> checkEmail(@RequestBody UserRequestDto userRequestDto) {
+        return userService.checkEmail(userRequestDto);
     }
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserDto userDTO, HttpSession session) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserRequestDto userRequestDTO, HttpSession session) {
         Map<String, String> response = new HashMap<>();
-        Map<String, Object> loginResult = userService.login(userDTO);
+        Map<String, Object> loginResult = userService.login(userRequestDTO);
 
         if ("SUCCESS".equals(loginResult.get("status"))) {
             User user = (User) loginResult.get("user");
@@ -102,14 +102,14 @@ public class UserController {
 
     // 비밀번호 수정
     @PatchMapping("/modifyPassword")
-    public ResponseEntity<Boolean> modifyPassword (@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.modifyPassword(userDto));
+    public ResponseEntity<Boolean> modifyPassword (@RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.modifyPassword(userRequestDto));
     }
 
     // 닉네임 수정
     @PatchMapping("/modifyNickname")
-    public ResponseEntity<Boolean> modifyNickname (@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.modifyNickname(userDto));
+    public ResponseEntity<Boolean> modifyNickname (@RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.modifyNickname(userRequestDto));
     }
 
     // 닉네임 중복 확인
@@ -126,8 +126,8 @@ public class UserController {
 
     // 회원탈퇴
     @DeleteMapping("/leaveUser")
-    public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
-        return userService.leaveUser(userDto, request, response);
+    public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
+        return userService.leaveUser(userRequestDto, request, response);
     }
 
 

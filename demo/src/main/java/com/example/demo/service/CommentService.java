@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.dao.CmtDao;
-import com.example.demo.dto.CmtDto;
+import com.example.demo.dao.CommentDao;
+import com.example.demo.dto.CommentDto;
 import com.example.demo.entitiy.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,24 +13,24 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class CmtService {
-    private final CmtDao cmtDao;
+public class CommentService {
+    private final CommentDao commentDao;
 
     // 댓글 등록
-    public boolean insertCmt(CmtDto cmtDto) {
+    public boolean insertCmt(CommentDto commentDto) {
 
         Comment comment = new Comment();
-        comment.setPostId(cmtDto.getPostId());
-        comment.setText(cmtDto.getText());
-        comment.setUserNum(cmtDto.getUserNum());
+        comment.setPostId(commentDto.getPostId());
+        comment.setText(commentDto.getText());
+        comment.setUserId(commentDto.getUserId());
 
-        return cmtDao.insertCmt(comment);
+        return commentDao.insertCmt(comment);
     }
 
     // 댓글 불러오기
-    public ResponseEntity<Map<String, Object>>getCmt(int seq){
+    public ResponseEntity<Map<String, Object>>getCmt(long id){
        try {
-           Map<String,Object> cmtList = cmtDao.getCmt(seq);
+           Map<String,Object> cmtList = commentDao.getComment(id);
            // 댓글이 있으면 성공 응답 반환
            if (cmtList != null && !cmtList.isEmpty()) {
                Map<String, Object> response = new HashMap<>();
@@ -52,17 +52,17 @@ public class CmtService {
     }
 
     // 댓글 수정
-    public boolean modifyCmt(CmtDto cmtDto) {
+    public boolean modifyCmt(CommentDto commentDto) {
 
         Comment comment = new Comment();
-        comment.setSeq(cmtDto.getSeq());
-        comment.setText(cmtDto.getText());
+        comment.setSeq(commentDto.getSeq());
+        comment.setText(commentDto.getText());
 
-        return cmtDao.modifyCmt(comment);
+        return commentDao.modifyCmt(comment);
     }
 
     // 댓글 삭제
     public boolean removeCmt(int seq) {
-        return cmtDao.removeCmt(seq);
+        return commentDao.removeCmt(seq);
     }
 }

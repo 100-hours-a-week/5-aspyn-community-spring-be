@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CmtDto;
-import com.example.demo.service.CmtService;
+import com.example.demo.dto.CommentDto;
+import com.example.demo.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +13,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/comment")
-public class CmtController {
-    private final CmtService cmtService;
+public class CommentController {
+    private final CommentService commentService;
 
     // 댓글 등록
     @PostMapping("/edit")
-    public ResponseEntity<Map<String, Object>> newCmt(@RequestBody CmtDto cmtDto) {
+    public ResponseEntity<Map<String, Object>> newCmt(@RequestBody CommentDto commentDto) {
         Map<String, Object> response = new HashMap<>();
 
-        boolean newCmt = cmtService.insertCmt(cmtDto);
+        boolean newCmt = commentService.insertCmt(commentDto);
 
         if (newCmt) {
             response.put("status", "SUCCESS");
@@ -37,15 +37,15 @@ public class CmtController {
     // 댓글 불러오기
     @GetMapping("/{seq}")
     public ResponseEntity<Map<String, Object>> getCmt(@PathVariable("seq") int seq) {
-        return cmtService.getCmt(seq);
+        return commentService.getCmt(seq);
     }
 
     // 댓글 수정
     @PatchMapping("/modify")
-    public ResponseEntity<Map<String, Object>> modifyCmt(@RequestBody CmtDto cmtDto) {
+    public ResponseEntity<Map<String, Object>> modifyCmt(@RequestBody CommentDto commentDto) {
         Map<String, Object> response = new HashMap<>();
 
-        boolean modifyCmt = cmtService.modifyCmt(cmtDto);
+        boolean modifyCmt = commentService.modifyCmt(commentDto);
 
         if (modifyCmt) {
             response.put("status", "SUCCESS");
@@ -62,7 +62,7 @@ public class CmtController {
     @DeleteMapping("/remove/{seq}")
     public ResponseEntity<Map<String, Object>> removeCmt(@PathVariable int seq) {
         Map<String, Object> response = new HashMap<>();
-        boolean isRemoved = cmtService.removeCmt(seq);
+        boolean isRemoved = commentService.removeCmt(seq);
 
         if (isRemoved) {
             response.put("status", "SUCCESS");

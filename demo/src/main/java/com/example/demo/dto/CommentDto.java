@@ -6,12 +6,12 @@ import lombok.Setter;
 import java.util.Date;
 
 @Getter @Setter
-public class CmtDto {
-    private int seq;
+public class CommentDto {
+    private long id;
     private String text;
     private Date writeDate;
     private Date modifyDate;
     private String delete;
-    private int userNum;
-    private int postId;
+    private long userId;
+    private long postId;
 }
