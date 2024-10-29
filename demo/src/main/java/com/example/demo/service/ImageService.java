@@ -18,7 +18,7 @@ public class ImageService {
     }
 
     // 이미지 URL 조회
-    public String getUserProfileImage(int userId) {
+    public String getUserProfileImage(long userId) {
         return imageDao.getUserProfileImage(userId);
     }
 

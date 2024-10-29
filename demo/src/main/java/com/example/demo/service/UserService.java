@@ -121,7 +121,7 @@ public class UserService {
     }
 
     // 유저 정보 조회
-    public ResponseEntity<Map<String, Object>> loginUser(int id) {
+    public ResponseEntity<Map<String, Object>> loginUser(long id) {
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> result = userDAO.loginUser(id);
 

@@ -17,7 +17,7 @@ public class ImageDao {
     }
 
     // userId로 유저의 프로필 이미지 URL 조회
-    public String getUserProfileImage(int userId) {
+    public String getUserProfileImage(long userId) {
         String sql = "SELECT profile_image_url FROM user WHERE user_num = ?";
         return jdbcTemplate.queryForObject(sql,new Object[]{userId}, String.class);
     }

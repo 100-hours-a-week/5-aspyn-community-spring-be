@@ -120,7 +120,7 @@ public class UserController {
 
     // 유저 정보 조회
     @GetMapping("/loginUser/{id}")
-    public ResponseEntity<Map<String, Object>> loginUser(@PathVariable int id) {
+    public ResponseEntity<Map<String, Object>> loginUser(@PathVariable long id) {
         return userService.loginUser(id);
     }
 

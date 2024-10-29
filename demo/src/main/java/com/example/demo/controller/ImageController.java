@@ -48,7 +48,7 @@ public class ImageController {
 
     // 프로필 이미지 불러오기
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable int userId) {
+    public ResponseEntity<Map<String, String>> getProfileImage(@PathVariable long userId) {
         Map<String, String> response = new HashMap<>();
         try{
             String imageUrl = imageService.getUserProfileImage(userId);
