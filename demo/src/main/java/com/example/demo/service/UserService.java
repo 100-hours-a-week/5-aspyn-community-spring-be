@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserService {
     private final UserDao userDAO;
+    private final S3Service s3Service;
+    private final ImageService imageService;
 
     /**
      * 회원가입
@@ -29,15 +33,23 @@ public class UserService {
      * @return boolean
      * */
     @Transactional
-    public boolean registerUser(UserRequestDto userRequestDTO) throws SQLException {
+    public boolean registerUser(UserRequestDto userRequestDTO, MultipartFile profileImage) throws IOException {
+
+        String imageUrl = null;
+
+        // 프로필 이미지 있다면 S3에 이미지 업로드
+        if (profileImage != null) {
+            String imagePath = "profile/";
+            imageUrl = s3Service.uploadImage(profileImage,imagePath);
+        }
 
         // UserDTO를 User 객체로 변환
         User user = new User();
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(userRequestDTO.getPassword());
         user.setNickname(userRequestDTO.getNickname());
+        user.setProfileUrl(imageUrl);
 
-        // 데이터베이스 저장 처리 후 결과 반환
         return userDAO.insertUser(user);
     }
 

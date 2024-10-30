@@ -55,7 +55,7 @@ public class CommentService {
     public boolean modifyCmt(CommentDto commentDto) {
 
         Comment comment = new Comment();
-        comment.setSeq(commentDto.getSeq());
+        comment.setId(commentDto.getId());
         comment.setText(commentDto.getText());
 
         return commentDao.modifyCmt(comment);

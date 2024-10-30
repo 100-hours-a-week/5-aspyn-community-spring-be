@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,10 @@ public class UserController {
     // @PostMapping 이랑 같은 기능
     // @RequestMapping(method = RequestMethod.POST, path = "api/user/join")
     @PostMapping("/join")
-    public ResponseEntity<Map<String, String>> join(@RequestBody UserRequestDto userRequestDTO) throws SQLException {
+    public ResponseEntity<Map<String, String>> join(
+            @RequestPart UserRequestDto userRequestDTO,
+            @RequestPart("profileImage") MultipartFile profileImage
+    ) throws IOException {
         Map<String,String> response = new HashMap<>();
         try {
             // 회원가입
@@ -37,7 +42,7 @@ public class UserController {
                 return ResponseEntity.badRequest().body(response);
             }
             // 신규 회원 정보 디비에 생성
-            boolean isJoined = userService.registerUser(userRequestDTO);
+            boolean isJoined = userService.registerUser(userRequestDTO, profileImage);
 
             if (isJoined) {
                 response.put("status", "SUCCESS");
@@ -48,7 +53,7 @@ public class UserController {
                 response.put("message", "회원가입에 실패했습니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-        } catch (SQLException e) {
+        } catch (IOException e) {
             e.printStackTrace(); // 예외 메세지 콘솔 출력
             response.put("message", "회원가입 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

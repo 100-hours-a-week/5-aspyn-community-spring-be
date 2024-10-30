@@ -13,8 +13,8 @@ public class ImageService {
     private final ImageDao imageDao;
 
     // 사용자 프로필 이미지 URL 업데이트 로직
-    public void updateUserProfileImage(String email, String imageUrl) {
-        imageDao.updateUserProfileImage(email, imageUrl);
+    public void updateUserProfileImage(long userId, String imageUrl) {
+        imageDao.updateUserProfileImage(userId, imageUrl);
     }
 
     // 이미지 URL 조회

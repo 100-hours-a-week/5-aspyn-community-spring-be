@@ -21,10 +21,9 @@ public class ImageController {
     private final ImageService imageService;
     private final S3Service s3Service;
 
-    // 회원가입 시 프로필 이미지 업로드
+    // 프로필 이미지 업로드
     @PostMapping("/profile/upload")
     public ResponseEntity<Map<String, String>> uploadProfileImage(
-            @RequestPart("email") String email,
             @RequestPart("profileImage") MultipartFile profileImage) {
         Map<String, String> response = new HashMap<>();
         try {
@@ -33,8 +32,9 @@ public class ImageController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            String imageUrl = s3Service.upload(profileImage, "profile/" + email);
-            imageService.updateUserProfileImage(email, imageUrl);
+            // 이미지 업로드
+            String imageUrl = s3Service.uploadImage(profileImage,);
+//            imageService.updateUserProfileImage(userId, imageUrl);
 
             response.put("status", "SUCCESS");
             response.put("message", "프로필 이미지 업로드가 완료되었습니다.");
