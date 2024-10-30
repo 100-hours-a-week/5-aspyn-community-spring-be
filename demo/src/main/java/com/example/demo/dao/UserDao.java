@@ -93,7 +93,7 @@ public class UserDao {
 
     // 유저 정보 조회
     public Map<String, Object> loginUser (long id) {
-        String sql = "SELECT id, email, nickname FROM user WHERE id = ?";
+        String sql = "SELECT id, email, nickname, profile_url FROM user WHERE id = ?";
         return jdbcTemplate.queryForMap(sql, id);
     }
 

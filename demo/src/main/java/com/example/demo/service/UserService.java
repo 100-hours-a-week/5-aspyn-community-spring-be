@@ -141,9 +141,10 @@ public class UserService {
             response.put("message", "유저를 찾을 수 없습니다.");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } else {
-            response.put("id", result.get("user_num"));
+            response.put("id", result.get("id"));
             response.put("email", result.get("email"));
             response.put("nickname", result.get("nickname"));
+            response.put("profileUrl", result.get("profile_url"));
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
