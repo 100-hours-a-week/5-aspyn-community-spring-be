@@ -4,6 +4,7 @@ import com.example.demo.entitiy.User;
 import com.example.demo.dto.UserRequestDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,12 +59,35 @@ public class UserDao {
         return result > 0 ;
     }
 
-    // 닉네임 수정
-    public boolean modifyNickname(User user) {
-        String sql = "UPDATE user SET nickname = ? WHERE id = ?";
+    // 프로필 url 조회
+    public Map<String, Object> getProfileUrl(long id) {
+        String sql = "SELECT profile_url FROM user WHERE id = ?";
+        return jdbcTemplate.queryForMap(sql, id);
+    }
 
-        int result = jdbcTemplate.update(sql, user.getNickname(),user.getId());
-        return result > 0 ;
+    // 닉네임, 프로필 이미지 변경
+    public boolean modifyInfo(User user) {
+        StringBuilder sql = new StringBuilder("UPDATE user SET ");
+        Map<String, Object> updates = new HashMap<>();
+
+        if(user.getNickname() != null) {
+            sql.append("nickname = ?, ");
+            updates.put("nickname", user.getNickname());
+        }
+
+        if(user.getProfileUrl() != null) {
+            sql.append("profile_url = ?, ");
+            updates.put("profile_url", user.getProfileUrl());
+        }
+
+        sql.delete(sql.length()-2, sql.length()); // 쿼리 끝에 쉼표 제거
+        sql.append(" WHERE id = ?");
+        updates.put("id", user.getId());
+
+        Object[] params = updates.values().toArray();
+
+        int result = jdbcTemplate.update(sql.toString(), params);
+        return result > 0;
     }
 
     // 닉네임 중복 확인

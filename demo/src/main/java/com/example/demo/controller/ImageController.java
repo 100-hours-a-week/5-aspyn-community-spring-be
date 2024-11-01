@@ -22,29 +22,29 @@ public class ImageController {
     private final S3Service s3Service;
 
     // 프로필 이미지 업로드
-    @PostMapping("/profile/upload")
-    public ResponseEntity<Map<String, String>> uploadProfileImage(
-            @RequestPart("profileImage") MultipartFile profileImage) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            if (profileImage == null || profileImage.isEmpty()) {
-                response.put("message", "프로필 이미지가 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            // 이미지 업로드
-            String imageUrl = s3Service.uploadImage(profileImage,);
+//    @PostMapping("/profile/upload")
+//    public ResponseEntity<Map<String, String>> uploadProfileImage(
+//            @RequestPart("profileImage") MultipartFile profileImage) {
+//        Map<String, String> response = new HashMap<>();
+//        try {
+//            if (profileImage == null || profileImage.isEmpty()) {
+//                response.put("message", "프로필 이미지가 없습니다.");
+//                return ResponseEntity.badRequest().body(response);
+//            }
+//
+//            // 이미지 업로드
+//            String imageUrl = s3Service.uploadImage(profileImage,);
 //            imageService.updateUserProfileImage(userId, imageUrl);
-
-            response.put("status", "SUCCESS");
-            response.put("message", "프로필 이미지 업로드가 완료되었습니다.");
-            return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-            response.put("message", "프로필 이미지 업로드 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
+//
+//            response.put("status", "SUCCESS");
+//            response.put("message", "프로필 이미지 업로드가 완료되었습니다.");
+//            return ResponseEntity.ok(response);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            response.put("message", "프로필 이미지 업로드 중 오류가 발생했습니다.");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
 
     // 프로필 이미지 불러오기
     @GetMapping("/profile/{userId}")

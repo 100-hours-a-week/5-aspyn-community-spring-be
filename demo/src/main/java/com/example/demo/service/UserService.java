@@ -108,14 +108,35 @@ public class UserService {
         return userDAO.modifyPassword(user);
     }
 
-    // 닉네임 수정
-    public boolean modifyNickname(UserRequestDto userRequestDto) {
+    // 닉네임 및 프로필 이미지 수정
+    @Transactional
+    public boolean modifyInfo(UserRequestDto userRequestDto, MultipartFile profileImage) throws IOException {
 
         User user = new User();
         user.setId(userRequestDto.getId());
         user.setNickname(userRequestDto.getNickname());
 
-        return userDAO.modifyNickname(user);
+        String newProfileUrl = null;
+        String preProfileUrl = null;
+        if (profileImage != null) {
+            // 기존 프로필 url 조회
+            Map<String,Object> result = userDAO.getProfileUrl(user.getId());
+            preProfileUrl = result.get("profile_url").toString();
+
+            // 새로운 프로필 s3 업로드
+            newProfileUrl = s3Service.uploadImage(profileImage, "profile/");
+            user.setProfileUrl(newProfileUrl);
+        }
+
+        // 프로필 및 닉네임 변경사항 DB 저장
+        boolean modifyInfo = userDAO.modifyInfo(user);
+
+        if (profileImage != null) {
+            // 기존 프로필 이미지 S3에서 삭제
+            s3Service.deleteImage(preProfileUrl);
+        }
+
+        return modifyInfo;
     }
 
     // 닉네임 중복 확인

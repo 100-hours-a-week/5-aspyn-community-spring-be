@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entitiy.User;
 import com.example.demo.dto.UserRequestDto;
+import com.example.demo.service.S3Service;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final S3Service s3Service;
 
     //회원가입
     // @PostMapping 이랑 같은 기능
@@ -111,10 +113,14 @@ public class UserController {
         return ResponseEntity.ok(userService.modifyPassword(userRequestDto));
     }
 
-    // 닉네임 수정
+    // 닉네임 및 프로필 이미지 수정
+    // TODO: 엔드포인트 전체 수정 필요 Restful하게  -  userinfo
     @PatchMapping("/modifyNickname")
-    public ResponseEntity<Boolean> modifyNickname (@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userService.modifyNickname(userRequestDto));
+    public ResponseEntity<Boolean> modifyNickname (
+            @RequestPart UserRequestDto userRequestDto,
+            @RequestPart MultipartFile profileImage
+    ) throws IOException {
+        return ResponseEntity.ok(userService.modifyInfo(userRequestDto, profileImage));
     }
 
     // 닉네임 중복 확인
