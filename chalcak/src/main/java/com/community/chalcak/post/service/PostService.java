@@ -1,5 +1,6 @@
 package com.community.chalcak.post.service;
 
+import com.community.chalcak.image.service.S3Service;
 import com.community.chalcak.post.dao.PostDao;
 import com.community.chalcak.post.entity.Post;
 import com.community.chalcak.post.dto.PostDto;
@@ -7,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostDao postDao;
+    private final S3Service s3Service;
 
     // 게시글 목록 조회
     public Map<String, Object> getAllPosts() {
@@ -64,13 +68,20 @@ public class PostService {
 
     // 신규 게시글 등록
     @Transactional
-    public int newPost(PostDto postDto) {
+    public int newPost(PostDto postDto, MultipartFile image) throws IOException {
+
+        // 이미지 S3에 업로드
+        String imageUrl = s3Service.uploadImage(image, "post/");
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
+        post.setUserId(postDto.getUserId());
         post.setTitle(postDto.getTitle());
         post.setText(postDto.getText());
-        post.setUserId(postDto.getUserId());
+        post.setImgUrl(imageUrl);
+        post.setIris(postDto.getIris());
+        post.setShutterSpeed(postDto.getShutterSpeed());
+        post.setIso(postDto.getIso());
 
         return postDao.insertPost(post);
 
@@ -83,6 +94,7 @@ public class PostService {
         List<Post> prePost = postDao.getOnlyPost(postDto.getId());
         long postWriter = prePost.get(0).getUserId();
 
+        // 동일한 작성자인지 확인
         if (userId != postWriter) {
             return false;
         }
@@ -92,7 +104,6 @@ public class PostService {
         post.setId(postDto.getId());
         post.setTitle(postDto.getTitle());
         post.setText(postDto.getText());
-        post.setImgUrl(postDto.getImgUrl());
         post.setIris(postDto.getIris());
         post.setShutterSpeed(postDto.getShutterSpeed());
         post.setIso(postDto.getIso());

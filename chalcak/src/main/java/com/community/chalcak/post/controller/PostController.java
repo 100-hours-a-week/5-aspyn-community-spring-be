@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,10 +36,10 @@ public class PostController {
 
     // 게시글 작성
     @PostMapping("/edit")
-    public ResponseEntity<Map<String, String>> newPost(@RequestBody PostDto postDto){
+    public ResponseEntity<Map<String, String>> newPost(@RequestPart PostDto postDto, @RequestPart MultipartFile image) throws IOException {
         Map<String, String> response = new HashMap<>();
 
-        int newPostId = postService.newPost(postDto);
+        int newPostId = postService.newPost(postDto, image);
 
         if(newPostId > 0) {
             response.put("message", "게시글 작성이 완료되었습니다.");

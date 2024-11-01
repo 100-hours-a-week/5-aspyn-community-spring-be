@@ -129,11 +129,11 @@ public class PostDao {
     }
 
 
-    // 게시글 수정
+    // 게시글 수정 - 이미지 수정 불가
     public boolean modifyPost(Post post) {
-        String sql = "UPDATE post SET title = ?, text = ?, img_url = ?, iris = ?, shutter_speed = ?, iso = ? " +
+        String sql = "UPDATE post SET title = ?, text = ?, iris = ?, shutter_speed = ?, iso = ? " +
                 " WHERE id = ?";
-        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(), post.getImgUrl(),
+        int result = jdbcTemplate.update(sql, post.getTitle(), post.getText(),
                 post.getIris(), post.getShutterSpeed(), post.getIso(), post.getId());
 
         return result > 0;
