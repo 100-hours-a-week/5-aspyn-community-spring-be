@@ -24,7 +24,6 @@ import java.util.Map;
 public class UserService {
     private final UserDao userDAO;
     private final S3Service s3Service;
-    private final ImageService imageService;
 
     /**
      * 회원가입
