@@ -2,10 +2,8 @@ package com.community.chalcak.image.service;
 
 import com.community.chalcak.image.dao.ImageDao;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageService {

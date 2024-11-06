@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,12 +25,10 @@ public class UserController {
     private final S3Service s3Service;
 
     //회원가입
-    // @PostMapping 이랑 같은 기능
-    // @RequestMapping(method = RequestMethod.POST, path = "api/user/join")
-    @PostMapping("/join")
+    @PostMapping(value = "/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> join(
-            @RequestPart UserRequestDto userRequestDTO,
-            @RequestPart("profileImage") MultipartFile profileImage
+            @RequestPart(value = "request") UserRequestDto userRequestDTO,
+            @RequestPart(value = "file", required = false) MultipartFile profileImage
     ) throws IOException {
         Map<String,String> response = new HashMap<>();
         try {
@@ -114,10 +109,10 @@ public class UserController {
 
     // 닉네임 및 프로필 이미지 수정
     // TODO: 엔드포인트 전체 수정 필요 Restful하게  -  userinfo
-    @PatchMapping("/modifyNickname")
+    @PatchMapping(value = "/modifyNickname", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> modifyNickname (
-            @RequestPart UserRequestDto userRequestDto,
-            @RequestPart MultipartFile profileImage
+            @RequestPart(value="request") UserRequestDto userRequestDto,
+            @RequestPart(value="file", required = false) MultipartFile profileImage
     ) throws IOException {
         return ResponseEntity.ok(userService.modifyInfo(userRequestDto, profileImage));
     }
@@ -139,6 +134,4 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
         return userService.leaveUser(userRequestDto, request, response);
     }
-
-
 }

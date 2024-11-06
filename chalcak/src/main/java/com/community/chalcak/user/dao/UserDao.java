@@ -7,9 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class UserDao {
@@ -67,7 +65,7 @@ public class UserDao {
     // 닉네임, 프로필 이미지 변경
     public boolean modifyInfo(User user) {
         StringBuilder sql = new StringBuilder("UPDATE user SET ");
-        Map<String, Object> updates = new HashMap<>();
+        Map<String, Object> updates = new LinkedHashMap<>();
 
         if(user.getNickname() != null) {
             sql.append("nickname = ?, ");

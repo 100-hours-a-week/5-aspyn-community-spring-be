@@ -29,7 +29,7 @@ public class PostService {
         Map<String, Object> result = new HashMap<>();
         List<Post> allPosts = postDao.findAllPosts();
 
-        log.debug("#### 게시글 목록 조회");
+//        log.debug("#### 게시글 목록 조회");
         if (allPosts == null) {
             result.put("status", "ERROR");
             result.put("message", "게시글 조회 중 오류가 발생하였습니다.");

@@ -115,15 +115,17 @@ public class UserService {
         user.setId(userRequestDto.getId());
         user.setNickname(userRequestDto.getNickname());
 
-        String newProfileUrl = null;
         String preProfileUrl = null;
         if (profileImage != null) {
             // 기존 프로필 url 조회
             Map<String,Object> result = userDAO.getProfileUrl(user.getId());
-            preProfileUrl = result.get("profile_url").toString();
+            if (result.get("profile_url") != null) {
+                preProfileUrl = result.get("profile_url").toString();
+            }
 
             // 새로운 프로필 s3 업로드
-            newProfileUrl = s3Service.uploadImage(profileImage, "profile/");
+            String newProfileUrl = s3Service.uploadImage(profileImage, "profile/");
+            // 엔티티에 새로운 프로필 url 삽입
             user.setProfileUrl(newProfileUrl);
         }
 
@@ -131,8 +133,10 @@ public class UserService {
         boolean modifyInfo = userDAO.modifyInfo(user);
 
         if (profileImage != null) {
-            // 기존 프로필 이미지 S3에서 삭제
-            s3Service.deleteImage(preProfileUrl);
+            if (preProfileUrl != null) {
+                // 기존 프로필 이미지 S3에서 삭제
+                s3Service.deleteImage(preProfileUrl);
+            }
         }
 
         return modifyInfo;

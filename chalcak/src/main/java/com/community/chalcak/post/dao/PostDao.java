@@ -48,10 +48,10 @@ public class PostDao {
         String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, " +
                 "p.updated_at, p.user_id, u.nickname, u.profile_url " +
                 "FROM post p JOIN user u ON u.id = p.user_id " +
-                "WHERE p.delete_at IS NULL";
+                "WHERE p.deleted_at IS NULL";
 //        String sql2 = "SELECT p.*, u.nickname, u.profile_url " +
 //                "FROM post p JOIN user u ON u.id = p.user_id " +
-//                "WHERE p.delete_at IS NULL";
+//                "WHERE p.deleted_at IS NULL";
 
         try {
             return jdbcTemplate.query(sql, new PostRowMapper());
@@ -111,7 +111,7 @@ public class PostDao {
 
     // 신규 게시글 작성
     public int insertPost(Post post) {
-        String sql = "INSERT INTO post (title, text, img_url, user_id, iris, shutterSpeed, iso) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO post (title, text, img_url, user_id, iris, shutter_speed, iso) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
