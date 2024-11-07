@@ -124,9 +124,17 @@ public class UserController {
     }
 
     // 유저 정보 조회
-    @GetMapping("/loginUser/{id}")
+    @GetMapping("/loginUser/{id}") // info로 수정
     public ResponseEntity<Map<String, Object>> loginUser(@PathVariable long id) {
+
         return userService.loginUser(id);
+    }
+
+    // 프로필 이미지 불러오기
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<Map<String, Object>> getProfileImage(@PathVariable long userId) {
+
+        return userService.loginUser(userId);
     }
 
     // 회원탈퇴
