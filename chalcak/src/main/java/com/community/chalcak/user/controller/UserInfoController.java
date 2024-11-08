@@ -1,5 +1,7 @@
 package com.community.chalcak.user.controller;
 
+import com.community.chalcak.user.dto.UserResponseDto;
+import com.community.chalcak.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +14,26 @@ import java.util.Map;
 @RestController
 public class UserInfoController {
 
+    private final UserService userService;
+
+    public UserInfoController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/api/userinfo")
     public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
 
         // 세션에서 유저 정보 가져오기
-        String userId = session.getAttribute("user_id").toString();
+        Long userId = (Long) session.getAttribute("user_id");
 
         if (userId != null) {
+            UserResponseDto userDto = userService.getUserInfo(userId);
+
             Map<String, String> response = new HashMap<>();
-            response.put("user_id", userId);
+            response.put("user_id", String.valueOf(userDto.getId()));
+            response.put("email", userDto.getEmail());
+            response.put("nickname", userDto.getNickname());
+            response.put("profile_url", userDto.getProfileUrl());
 
             return ResponseEntity.ok(response);
         } else {

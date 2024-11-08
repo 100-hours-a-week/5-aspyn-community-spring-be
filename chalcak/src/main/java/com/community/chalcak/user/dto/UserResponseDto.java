@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 public class UserResponseDto {
     private long id;
     private String email;
-    private String password;
     private String nickname;
     private String profileUrl;
     private LocalDateTime deletedAt;

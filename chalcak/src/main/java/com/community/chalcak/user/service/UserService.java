@@ -1,6 +1,7 @@
 package com.community.chalcak.user.service;
 
 import com.community.chalcak.user.dao.UserDao;
+import com.community.chalcak.user.dto.UserResponseDto;
 import com.community.chalcak.user.entity.User;
 import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.image.service.S3Service;
@@ -159,7 +160,7 @@ public class UserService {
     // 유저 정보 조회
     public ResponseEntity<Map<String, Object>> loginUser(long id) {
         Map<String, Object> response = new HashMap<>();
-        Map<String, Object> result = userDAO.loginUser(id);
+        Map<String, Object> result = userDAO.getUserInfo(id);
 
         if (result == null) {
             response.put("message", "유저를 찾을 수 없습니다.");
@@ -171,6 +172,18 @@ public class UserService {
             response.put("profileUrl", result.get("profile_url"));
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
+    }
+
+    public UserResponseDto getUserInfo(long id) {
+        Map<String, Object> user = userDAO.getUserInfo(id);
+
+        UserResponseDto userDto = new UserResponseDto();
+        userDto.setId((Long) user.get("id"));
+        userDto.setEmail(user.get("email").toString());
+        userDto.setNickname(user.get("nickname").toString());
+        userDto.setProfileUrl(user.get("profile_url").toString());
+
+        return userDto;
     }
 
     // 회원탈퇴
