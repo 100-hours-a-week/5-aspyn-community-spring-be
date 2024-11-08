@@ -76,7 +76,7 @@ public class PostDao {
     // 특정 게시글 및 댓글 조회
     public Optional<Post> getPost(long id) {
         String sql =
-                "SELECT p.*, u.nickname, u.deleted_at FROM post p" +
+                "SELECT p.*, u.nickname, u.profile_url, u.deleted_at FROM post p" +
                 " JOIN user u ON p.user_id = u.id " +
                 " WHERE p.id = ? AND u.deleted_at IS NULL";
 
