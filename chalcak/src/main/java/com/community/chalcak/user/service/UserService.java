@@ -149,12 +149,11 @@ public class UserService {
     }
 
     // 이메일 중복 확인
-    public ResponseEntity<Boolean>checkEmail (UserRequestDto userRequestDto) {
+    public Boolean checkEmail (UserRequestDto userRequestDto) {
 
         String email = userRequestDto.getEmail();
 
-        boolean usable = userDAO.checkEmail(email); // true 일시 중복 이메일 존재
-        return new ResponseEntity<>(!usable, HttpStatus.OK);
+        return userDAO.checkEmail(email); // true 일시 중복 이메일 존재
     }
 
     // 유저 정보 조회

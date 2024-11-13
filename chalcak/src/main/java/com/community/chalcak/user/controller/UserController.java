@@ -27,39 +27,51 @@ public class UserController {
     //회원가입
     @PostMapping(value = "/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> join(
-            @RequestPart(value = "request") UserRequestDto userRequestDTO,
+            @RequestPart(value = "request") UserRequestDto userRequestDto,
             @RequestPart(value = "file", required = false) MultipartFile profileImage
     ) throws IOException {
         Map<String,String> response = new HashMap<>();
-        try {
-            // 회원가입
-            if (userRequestDTO == null) {
-                response.put("message", "가입할 회원 정보가 없습니다.");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // 신규 회원 정보 디비에 생성
-            boolean isJoined = userService.registerUser(userRequestDTO, profileImage);
 
-            if (isJoined) {
-                response.put("status", "SUCCESS");
-                response.put("message", "회원가입이 완료되었습니다.");
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("status", "ERROR");
-                response.put("message", "회원가입에 실패했습니다.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        // 이메일 중복 확인
+        // true = 중복, false = 사용 가능 이메일
+        boolean usedEmail = userService.checkEmail(userRequestDto);
+
+        // 닉네임 중복 확인
+        // true = 중복, false = 사용 가능 닉네임
+        boolean usedNickname = userService.checkNickname(userRequestDto.getNickname());
+
+        if(usedEmail) {
+            response.put("message", "중복된 이메일 입니다.");
+            return ResponseEntity.badRequest().body(response);
+        } else if(usedNickname) {
+            response.put("message", "중복된 닉네임 입니다.");
+            return ResponseEntity.badRequest().body(response);
+        } else {
+
+            try {
+                // 회원가입
+                if (userRequestDto == null) {
+                    response.put("message", "가입할 회원 정보가 없습니다.");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                // 신규 회원 정보 디비에 생성
+                boolean isJoined = userService.registerUser(userRequestDto, profileImage);
+
+                if (isJoined) {
+                    response.put("status", "SUCCESS");
+                    response.put("message", "회원가입이 완료되었습니다.");
+                    return ResponseEntity.ok(response);
+                } else {
+                    response.put("status", "ERROR");
+                    response.put("message", "회원가입에 실패했습니다.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                }
+            } catch (IOException e) {
+                e.printStackTrace(); // 예외 메세지 콘솔 출력
+                response.put("message", "회원가입 중 오류가 발생했습니다.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-        } catch (IOException e) {
-            e.printStackTrace(); // 예외 메세지 콘솔 출력
-            response.put("message", "회원가입 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    // 이메일 중복 확인
-    @PostMapping("/isExist")
-    public ResponseEntity<Boolean> checkEmail(@RequestBody UserRequestDto userRequestDto) {
-        return userService.checkEmail(userRequestDto);
     }
 
     //로그인
