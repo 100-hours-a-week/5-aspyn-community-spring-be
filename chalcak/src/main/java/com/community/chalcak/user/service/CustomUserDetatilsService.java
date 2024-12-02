@@ -23,7 +23,6 @@ public class CustomUserDetatilsService implements UserDetailsService {
 
         System.out.println("username 값 확인 : " + username);
 
-
         // DB에서 유저 정보 조회
         User userData = userDao.findByUsername(username);
 
@@ -33,7 +32,7 @@ public class CustomUserDetatilsService implements UserDetailsService {
 
             UserEntity userEntity = new UserEntity();
             userEntity.setId(userData.getId());
-            userEntity.setUsername(userData.getEmail());
+            userEntity.setEmail(userData.getEmail());
             userEntity.setPassword(userData.getPassword());
 
             //UserDetails에 담아서 return하면 AutneticationManager가 검증 함

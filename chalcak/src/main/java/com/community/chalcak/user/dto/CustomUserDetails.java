@@ -21,6 +21,10 @@ public class CustomUserDetails implements UserDetails {
         return new ArrayList<>(); // 빈 권한 리스트 반환
     }
 
+    public Long getUserId() {
+        return userEntity.getId();
+    }
+
     @Override
     public String getPassword() {
         return userEntity.getPassword();
@@ -28,7 +32,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userEntity.getUsername();
+        return userEntity.getEmail();
     }
 
     @Override

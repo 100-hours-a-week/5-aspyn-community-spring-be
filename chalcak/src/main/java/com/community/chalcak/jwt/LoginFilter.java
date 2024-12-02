@@ -24,13 +24,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         // 클라이언트 요청에서 username, password 추출
-        String username = obtainUsername(request);
+        String email = request.getParameter("email");
         String password = obtainPassword(request);
 
-        System.out.println("로그인 시도 아이디: " + username);
+        System.out.println("로그인 시도 아이디: " + email);
+        System.out.println("비밀번호: " + password);
 
-        // 스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
+        // 스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
+
+        System.out.println("토큰 결과 출력: " + authToken);
 
         // token에 담은 검증을 위한 AuthenticationManager로 전달
         return authenticationManager.authenticate(authToken);
@@ -44,9 +47,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
+        Long userId = customUserDetails.getUserId();
         String username = customUserDetails.getUsername();
 
-        String token = jwtUtil.createJwt(username, 60*60*10L);
+        String token = jwtUtil.createJwt(userId, username, 60*60*10L);
 
         System.out.println("발급된 jwt : Bearer " + token);
 
@@ -57,6 +61,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) {
 
+        //로그인 실패시 401 응답 코드 반환
         System.out.println("fail");
+        response.setStatus(401);
     }
 }

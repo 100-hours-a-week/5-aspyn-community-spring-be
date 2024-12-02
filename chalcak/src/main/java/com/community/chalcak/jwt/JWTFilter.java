@@ -52,14 +52,17 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        //토큰에서 username 획득
-        String username = jwtUtil.getUsername(token);
+        // 토큰에서 유저id 획득
+        Long userId = jwtUtil.getUserId(token);
+
+        //토큰에서 email 획득
+        String email = jwtUtil.getUsername(token);
 
         //userEntity를 생성하여 값 set
         UserEntity userEntity = new UserEntity();
-        userEntity.setUsername(username);
+        userEntity.setId(userId);
+        userEntity.setEmail(email);
         userEntity.setPassword("temppassword");
-
 
         //UserDetails에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
