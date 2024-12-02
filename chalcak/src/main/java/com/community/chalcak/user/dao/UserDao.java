@@ -1,7 +1,6 @@
 package com.community.chalcak.user.dao;
 
 import com.community.chalcak.user.entity.User;
-import com.community.chalcak.user.dto.UserRequestDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,12 +26,12 @@ public class UserDao {
         return result > 0;
     }
 
-    // 로그인 확인
-    public User checkLogin(UserRequestDto userRequestDto) {
-        String sql = "SELECT id, email, password, nickname, profile_url, deleted_at FROM user WHERE email = ?";
+    // 유저 정보 조회(로그인)
+    public User findByUsername(String username) {
+        String sql = "SELECT id, email, password, nickname, profile_url, deleted_at FROM `user` WHERE email = ?";
 
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{userRequestDto.getEmail()}, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, new Object[]{username}, (rs, rowNum) -> {
                 User dbUser = new User(); // db에서 확인한 로그인 유저 정보
                 dbUser.setId(rs.getInt("id"));
                 dbUser.setEmail(rs.getString("email"));
@@ -40,6 +39,8 @@ public class UserDao {
                 dbUser.setNickname(rs.getString("nickname"));
                 dbUser.setProfileUrl(rs.getString("profile_url"));
                 dbUser.setDeletedAt(rs.getTimestamp("deleted_at"));
+
+                System.out.println("데이터베이스 결과 조회 : " + dbUser);
                 return dbUser;
             });
         } catch (EmptyResultDataAccessException e) {

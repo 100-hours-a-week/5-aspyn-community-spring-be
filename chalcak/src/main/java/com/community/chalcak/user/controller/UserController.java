@@ -1,5 +1,6 @@
 package com.community.chalcak.user.controller;
 
+import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.entity.User;
 import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.image.service.S3Service;
@@ -22,23 +23,22 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final S3Service s3Service;
 
     //회원가입
     @PostMapping(value = "/join", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> join(
-            @RequestPart(value = "request") UserRequestDto userRequestDto,
+            @RequestPart(value = "request") JoinDto joinDto,
             @RequestPart(value = "file", required = false) MultipartFile profileImage
     ) throws IOException {
         Map<String,String> response = new HashMap<>();
 
         // 이메일 중복 확인
         // true = 중복, false = 사용 가능 이메일
-        boolean usedEmail = userService.checkEmail(userRequestDto);
+        boolean usedEmail = userService.checkEmail(joinDto);
 
         // 닉네임 중복 확인
         // true = 중복, false = 사용 가능 닉네임
-        boolean usedNickname = userService.checkNickname(userRequestDto.getNickname());
+        boolean usedNickname = userService.checkNickname(joinDto.getNickname());
 
         if(usedEmail) {
             response.put("message", "중복된 이메일 입니다.");
@@ -50,12 +50,12 @@ public class UserController {
 
             try {
                 // 회원가입
-                if (userRequestDto == null) {
+                if (joinDto == null) {
                     response.put("message", "가입할 회원 정보가 없습니다.");
                     return ResponseEntity.badRequest().body(response);
                 }
                 // 신규 회원 정보 디비에 생성
-                boolean isJoined = userService.registerUser(userRequestDto, profileImage);
+                boolean isJoined = userService.registerUser(joinDto, profileImage);
 
                 if (isJoined) {
                     response.put("status", "SUCCESS");
@@ -74,44 +74,11 @@ public class UserController {
         }
     }
 
-    //로그인
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserRequestDto userRequestDTO, HttpSession session) {
-        Map<String, String> response = new HashMap<>();
-        Map<String, Object> loginResult = userService.login(userRequestDTO);
-
-        if ("SUCCESS".equals(loginResult.get("status"))) {
-            User user = (User) loginResult.get("user");
-
-            // 세션에 유저 정보 저장
-            session.setAttribute("user_id", user.getId());
-
-            response.put("message", "로그인이 완료되었습니다.");
-            response.put("status", "SUCCESS");
-            response.put("userId", String.valueOf(user.getId()));
-
-            // 쿠키에 유저 ID 저장
-            ResponseCookie responseCookie = ResponseCookie.from("user_id", String.valueOf(user.getId()))
-                    .path("/")
-                    .httpOnly(true)
-                    .maxAge(1800)
-                    .build();
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                    .body(response);
-        } else {
-            response.put("message", (String) loginResult.get("message"));
-            response.put("status", "ERROR");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.logout(request);
     }
-
-//    // 로그아웃
-//    @PostMapping("/logout")
-//    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletRespzonse response) {
-//        return userService.logout(request);
-//    }
 
     // 비밀번호 수정
     @PatchMapping("/modifyPassword")

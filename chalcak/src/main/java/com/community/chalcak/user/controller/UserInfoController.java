@@ -5,6 +5,7 @@ import com.community.chalcak.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,14 @@ public class UserInfoController {
 
     public UserInfoController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/")
+    public String userUsingSession() {
+
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return "세션 현재 사용자 아이디 : " + name;
     }
 
     @GetMapping("/api/userinfo")

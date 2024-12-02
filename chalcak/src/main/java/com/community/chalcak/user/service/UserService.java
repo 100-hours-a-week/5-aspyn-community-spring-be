@@ -1,6 +1,7 @@
 package com.community.chalcak.user.service;
 
 import com.community.chalcak.user.dao.UserDao;
+import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.dto.UserResponseDto;
 import com.community.chalcak.user.entity.User;
 import com.community.chalcak.user.dto.UserRequestDto;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,15 +27,16 @@ import java.util.Map;
 public class UserService {
     private final UserDao userDAO;
     private final S3Service s3Service;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
      *
-     * @param userRequestDTO
+     * @param joinDto
      * @return boolean
      * */
     @Transactional
-    public boolean registerUser(UserRequestDto userRequestDTO, MultipartFile profileImage) throws IOException {
+    public boolean registerUser(JoinDto joinDto, MultipartFile profileImage) throws IOException {
 
         String imageUrl = null;
 
@@ -45,9 +48,9 @@ public class UserService {
 
         // UserDTO를 User 객체로 변환
         User user = new User();
-        user.setEmail(userRequestDTO.getEmail());
-        user.setPassword(userRequestDTO.getPassword());
-        user.setNickname(userRequestDTO.getNickname());
+        user.setEmail(joinDto.getEmail());
+        user.setPassword(passwordEncoder.encode(joinDto.getPassword()));
+        user.setNickname(joinDto.getNickname());
         user.setProfileUrl(imageUrl);
 
         return userDAO.insertUser(user);
@@ -63,7 +66,7 @@ public class UserService {
         Map<String, Object> result = new HashMap<>();
 
         // 로그인 시도 이메일과 db 정보 대조하여 데이터 가져옴
-        User dbUser = userDAO.checkLogin(userRequestDTO);
+        User dbUser = userDAO.findByUsername(userRequestDTO.getEmail());
         // TODO: 비밀번호 검증 수정 필요
         //  해시 알고리즘 사용 또는 다른 방법
         if (dbUser == null) {
@@ -149,9 +152,9 @@ public class UserService {
     }
 
     // 이메일 중복 확인
-    public Boolean checkEmail (UserRequestDto userRequestDto) {
+    public Boolean checkEmail (JoinDto joinDto) {
 
-        String email = userRequestDto.getEmail();
+        String email = joinDto.getEmail();
 
         return userDAO.checkEmail(email); // true 일시 중복 이메일 존재
     }
