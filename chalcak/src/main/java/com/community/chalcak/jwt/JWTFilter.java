@@ -42,6 +42,9 @@ public class JWTFilter extends OncePerRequestFilter {
         //Bearer 부분 제거 후 순수 토큰만 획득
         String token = authorization.split(" ")[1];
 
+        System.out.println("로그인한 유저한테 전달받은 jwt: " + authorization);
+        System.out.println("전달받은 jwt에서 bearer 제거한 토큰: " + token);
+
         //토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
 

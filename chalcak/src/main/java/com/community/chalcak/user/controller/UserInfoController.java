@@ -1,8 +1,8 @@
 package com.community.chalcak.user.controller;
 
+import com.community.chalcak.user.dto.CustomUserDetails;
 import com.community.chalcak.user.dto.UserResponseDto;
 import com.community.chalcak.user.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,10 +30,15 @@ public class UserInfoController {
     }
 
     @GetMapping("/api/userinfo")
-    public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
+    public ResponseEntity<Map<String, String>> getUserInfo() {
 
-        // 세션에서 유저 정보 가져오기
-        Long userId = (Long) session.getAttribute("user_id");
+        // Authentication 객체에서 Principal(유저 정보) 가져오기
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // 유저 정보에서 userId와 username 가져오기
+        Long userId = userDetails.getUserId();
+
+        System.out.println("jwt 인증 후 컨텍스트홀더에서 가져온 유저 id: " + userId);
 
         if (userId != null) {
             UserResponseDto userDto = userService.getUserInfo(userId);
