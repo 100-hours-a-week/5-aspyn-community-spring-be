@@ -34,7 +34,7 @@ public class PostDao {
             post.setImgUrl(rs.getString("img_url"));
             post.setIris(rs.getString("iris"));
             post.setShutterSpeed(rs.getString("shutter_speed"));
-            post.setIso(rs.getInt("iso"));
+            post.setIso(rs.getString("iso"));
             post.setUpdatedAt(rs.getTimestamp("updated_at"));
             post.setUserId(rs.getInt("user_id"));
             post.setNickname(rs.getString("nickname"));
@@ -122,7 +122,7 @@ public class PostDao {
             ps.setLong(4, post.getUserId());
             ps.setString(5, post.getIris());
             ps.setString(6, post.getShutterSpeed());
-            ps.setInt(7, post.getIso());
+            ps.setString(7, post.getIso());
             return ps;
         }, keyHolder);
         return keyHolder.getKey().intValue();
