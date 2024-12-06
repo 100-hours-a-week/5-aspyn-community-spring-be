@@ -29,10 +29,10 @@ spring:
 upload:
     directory: /path/to/upload/directory
 
-logging:
-    level:
-        root: DEBUG
-        org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+#logging:
+#    level:
+#        root: DEBUG
+#        org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 
 
 # S3
