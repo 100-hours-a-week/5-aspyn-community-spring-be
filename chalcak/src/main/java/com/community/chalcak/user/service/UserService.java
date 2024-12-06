@@ -183,7 +183,7 @@ public class UserService {
         userDto.setId((Long) user.get("id"));
         userDto.setEmail(user.get("email").toString());
         userDto.setNickname(user.get("nickname").toString());
-        userDto.setProfileUrl(user.get("profile_url").toString());
+        userDto.setProfileUrl((String) user.get("profile_url"));
 
         return userDto;
     }
