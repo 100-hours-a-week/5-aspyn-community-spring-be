@@ -16,7 +16,7 @@ public class Post {
     private String imgUrl;
     private String iris; // 조리개
     private String shutterSpeed; // 셔터스피드
-    private int iso; // 감도
+    private String iso; // 감도
     private Timestamp updatedAt;
     private Timestamp deletedAt;
     private long userId; // 작성 유저
