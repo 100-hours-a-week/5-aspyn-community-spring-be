@@ -50,7 +50,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Long userId = customUserDetails.getUserId();
         String username = customUserDetails.getUsername();
 
-        String token = jwtUtil.createJwt(userId, username, 60*60*10L);
+        String token = jwtUtil.createJwt(userId, username, 60*60*10L*100);
 
         System.out.println("발급된 jwt : Bearer " + token);
 
