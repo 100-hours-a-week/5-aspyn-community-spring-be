@@ -53,9 +53,11 @@ public class PostController {
 
     // 게시글 수정
     @Transactional
-    @PatchMapping("/modify/{post}")
-    public ResponseEntity<Map<String, String>> modifyPost(@RequestBody PostDto postDto) {
+    @PatchMapping(value = "/modify/{post}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
+    public ResponseEntity<Map<String, String>> modifyPost(@RequestPart(value = "request") PostDto postDto) {
         Map<String, String> response = new HashMap<>();
+
+        System.out.println(postDto);
 
         boolean isModified = postService.modifyPost(postDto);
 

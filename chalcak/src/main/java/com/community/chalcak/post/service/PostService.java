@@ -4,6 +4,7 @@ import com.community.chalcak.image.service.S3Service;
 import com.community.chalcak.post.dao.PostDao;
 import com.community.chalcak.post.entity.Post;
 import com.community.chalcak.post.dto.PostDto;
+import com.community.chalcak.post.entity.PostInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class PostService {
     // 게시글 목록 조회
     public Map<String, Object> getAllPosts() {
         Map<String, Object> result = new HashMap<>();
-        List<Post> allPosts = postDao.findAllPosts();
+        List<PostInfo> allPosts = postDao.findAllPosts();
 
 //        log.debug("#### 게시글 목록 조회");
         if (allPosts == null) {
@@ -40,16 +41,16 @@ public class PostService {
         return result;
     }
 
-    // 특정 게시글 내용 조회 (게시글+댓글)
+    // 특정 게시글 상세 조회 (게시글+댓글)
     public Map<String, Object> getPost(long id) {
         Map<String, Object> result = new HashMap<>();
-        Optional<Post> postOptional = postDao.getPost(id);
+        Optional<PostInfo> postOptional = postDao.getPost(id);
 
         if (!postOptional.isPresent()) {
             result.put("status", "ERROR");
             result.put("message", "게시글이 존재하지 않습니다.");
         } else {
-            Post dbPost = postOptional.get();
+            PostInfo dbPost = postOptional.get();
             if (dbPost.getDeletedAt() != null) {
                 result.put("status", "ERROR");
                 result.put("message", "삭제된 게시글입니다.");
@@ -62,7 +63,7 @@ public class PostService {
     }
 
     // 특정 게시글만 불러오기
-    public List<Post> getOnlyPost(long id) {
+    public Post getOnlyPost(long id) {
         return postDao.getOnlyPost(id);
     }
 
@@ -91,13 +92,19 @@ public class PostService {
     public boolean modifyPost(PostDto postDto) {
 
         long userId = postDto.getUserId();
-        List<Post> prePost = postDao.getOnlyPost(postDto.getId());
-        long postWriter = prePost.get(0).getUserId();
+        System.out.println(postDto.getId());
+        Post prePost = postDao.getOnlyPost(postDto.getId());
+
+        System.out.println(prePost);
+        long postWriter = prePost.getUserId();
 
         // 동일한 작성자인지 확인
         if (userId != postWriter) {
             return false;
         }
+
+        System.out.println(postDto.getShutterSpeed());
+        System.out.println(postDto.getText());
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
@@ -109,7 +116,7 @@ public class PostService {
         post.setIso(postDto.getIso());
         post.setUserId(postDto.getUserId()); // 작성자
 
-            return postDao.modifyPost(post);
+        return postDao.modifyPost(post);
 
     }
 

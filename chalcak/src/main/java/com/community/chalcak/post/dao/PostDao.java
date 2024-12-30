@@ -2,6 +2,7 @@ package com.community.chalcak.post.dao;
 
 import com.community.chalcak.comment.entitiy.Comment;
 import com.community.chalcak.post.entity.Post;
+import com.community.chalcak.post.entity.PostInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,6 +38,26 @@ public class PostDao {
             post.setIso(rs.getString("iso"));
             post.setUpdatedAt(rs.getTimestamp("updated_at"));
             post.setUserId(rs.getInt("user_id"));
+//            post.setNickname(rs.getString("nickname"));
+//            post.setProfileUrl(rs.getString("profile_url"));
+            return post;
+        }
+    }
+
+    // postInfo 객체에 값 삽입
+    private static class PostInfoRowMapper implements RowMapper<PostInfo> {
+        @Override
+        public PostInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            PostInfo post = new PostInfo();
+            post.setId(rs.getInt("id"));
+            post.setTitle(rs.getString("title"));
+            post.setText(rs.getString("text"));
+            post.setImgUrl(rs.getString("img_url"));
+            post.setIris(rs.getString("iris"));
+            post.setShutterSpeed(rs.getString("shutter_speed"));
+            post.setIso(rs.getString("iso"));
+            post.setUpdatedAt(rs.getTimestamp("updated_at"));
+            post.setUserId(rs.getInt("user_id"));
             post.setNickname(rs.getString("nickname"));
             post.setProfileUrl(rs.getString("profile_url"));
             return post;
@@ -44,7 +65,7 @@ public class PostDao {
     }
 
     // 전체 게시글 조회
-    public List<Post> findAllPosts() {
+    public List<PostInfo> findAllPosts() {
         String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, " +
                 "p.updated_at, p.user_id, u.nickname, u.profile_url " +
                 "FROM post p JOIN user u ON u.id = p.user_id " +
@@ -54,7 +75,7 @@ public class PostDao {
 //                "WHERE p.deleted_at IS NULL";
 
         try {
-            return jdbcTemplate.query(sql, new PostRowMapper());
+            return jdbcTemplate.query(sql, new PostInfoRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -62,11 +83,11 @@ public class PostDao {
     }
 
     // 특정 게시글만 조회
-    public List<Post> getOnlyPost(long id) {
+    public Post getOnlyPost(long id) {
         String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id FROM post  WHERE id = ?";
 
         try {
-            return jdbcTemplate.query(sql, new PostRowMapper());
+            return jdbcTemplate.queryForObject(sql, new PostRowMapper(), id);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -74,7 +95,7 @@ public class PostDao {
     }
 
     // 특정 게시글 및 댓글 조회
-    public Optional<Post> getPost(long id) {
+    public Optional<PostInfo> getPost(long id) {
         String sql =
                 "SELECT p.*, u.nickname, u.profile_url, u.deleted_at FROM post p" +
                 " JOIN user u ON p.user_id = u.id " +
@@ -83,27 +104,40 @@ public class PostDao {
         String sql2 = "SELECT * FROM comments c JOIN user u ON c.user_id = u.id " +
                 " WHERE c.post_id = ? AND c.deleted_at IS NULL AND u.deleted_at IS NULL";
         try {
-            List<Post> posts = jdbcTemplate.query(sql, new Object[]{id}, new PostRowMapper());
+            return jdbcTemplate.query(sql, new Object[]{id}, rs -> {
+                if (rs.next()) {
+                    PostInfo postInfo = new PostInfo();
+                    postInfo.setId(rs.getLong("id"));
+                    postInfo.setTitle(rs.getString("title"));
+                    postInfo.setText(rs.getString("text"));
+                    postInfo.setImgUrl(rs.getString("img_url"));
+                    postInfo.setIris(rs.getString("iris"));
+                    postInfo.setShutterSpeed(rs.getString("shutter_speed"));
+                    postInfo.setIso(rs.getString("iso"));
+                    postInfo.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    postInfo.setDeletedAt(rs.getTimestamp("deleted_at"));
+                    postInfo.setUserId(rs.getLong("user_id"));
+                    postInfo.setNickname(rs.getString("nickname"));
+                    postInfo.setProfileUrl(rs.getString("profile_url"));
 
-            if (!posts.isEmpty()) {
-                Post postResult = posts.get(0);
-                List<Comment> comments = jdbcTemplate.query(sql2, new Object[]{postResult.getId()}, (rs, rowNum) -> {
-                    Comment dbComments = new Comment();
-                    dbComments.setId(rs.getLong("id"));
-                    dbComments.setText(rs.getString("text"));
-                    dbComments.setPostId(rs.getLong("post_id"));
-                    dbComments.setUserId(rs.getLong("user_id"));
-                    dbComments.setUpdatedAt(rs.getTimestamp("updated_at"));
-                    dbComments.setNickname(rs.getString("nickname"));
-                    dbComments.setProfileUrl(rs.getString("profile_url"));
-                    dbComments.setUserDeletedAt(rs.getTimestamp("deleted_at"));
-                    return dbComments;
-                });
-                postResult.setComments(comments);
-                return Optional.of(postResult);
-            } else {
+                    // 댓글 조회
+                    List<Comment> comments = jdbcTemplate.query(sql2, new Object[]{postInfo.getId()}, (commentRs, rowNum) -> {
+                        Comment comment = new Comment();
+                        comment.setId(commentRs.getLong("id"));
+                        comment.setText(commentRs.getString("text"));
+                        comment.setPostId(commentRs.getLong("post_id"));
+                        comment.setUserId(commentRs.getLong("user_id"));
+                        comment.setUpdatedAt(commentRs.getTimestamp("updated_at"));
+                        comment.setNickname(commentRs.getString("nickname"));
+                        comment.setProfileUrl(commentRs.getString("profile_url"));
+                        return comment;
+                    });
+
+                    postInfo.setComments(comments);
+                    return Optional.of(postInfo);
+                }
                 return Optional.empty();
-            }
+            });
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
