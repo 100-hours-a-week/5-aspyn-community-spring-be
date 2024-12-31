@@ -1,13 +1,10 @@
 package com.community.chalcak.user.controller;
 
 import com.community.chalcak.user.dto.JoinDto;
-import com.community.chalcak.user.entity.User;
 import com.community.chalcak.user.dto.UserRequestDto;
-import com.community.chalcak.image.service.S3Service;
 import com.community.chalcak.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -81,14 +78,13 @@ public class UserController {
     }
 
     // 비밀번호 수정
-    @PatchMapping("/modifyPassword")
+    @PatchMapping("/password")
     public ResponseEntity<Boolean> modifyPassword (@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.modifyPassword(userRequestDto));
     }
 
     // 닉네임 및 프로필 이미지 수정
-    // TODO: 엔드포인트 전체 수정 필요 Restful하게  -  userinfo
-    @PatchMapping(value = "/modifyNickname", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/nickname", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> modifyNickname (
             @RequestPart(value="request") UserRequestDto userRequestDto,
             @RequestPart(value="file", required = false) MultipartFile profileImage
@@ -103,7 +99,7 @@ public class UserController {
     }
 
     // 유저 정보 조회
-    @GetMapping("/loginUser/{id}") // info로 수정
+    @GetMapping("/login/{id}") // info로 수정
     public ResponseEntity<Map<String, Object>> loginUser(@PathVariable long id) {
 
         return userService.loginUser(id);
@@ -117,7 +113,7 @@ public class UserController {
     }
 
     // 회원탈퇴
-    @DeleteMapping("/leaveUser")
+    @DeleteMapping("/leave")
     public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
         return userService.leaveUser(userRequestDto, request, response);
     }
