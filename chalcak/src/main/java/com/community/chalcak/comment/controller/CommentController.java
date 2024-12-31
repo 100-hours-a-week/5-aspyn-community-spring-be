@@ -59,7 +59,7 @@ public class CommentController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/remove/{seq}")
+    @DeleteMapping("/{seq}")
     public ResponseEntity<Map<String, Object>> removeCmt(@PathVariable int seq) {
         Map<String, Object> response = new HashMap<>();
         boolean isRemoved = commentService.removeCmt(seq);

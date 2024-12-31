@@ -53,7 +53,7 @@ public class PostController {
 
     // 게시글 수정
     @Transactional
-    @PatchMapping(value = "/modify/{post}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
+    @PatchMapping(value = "/{post}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     public ResponseEntity<Map<String, String>> modifyPost(@RequestPart(value = "request") PostDto postDto) {
         Map<String, String> response = new HashMap<>();
 
@@ -72,7 +72,7 @@ public class PostController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>>removePost(@PathVariable int id) {
         Map<String, Object> response = new HashMap<>();
         boolean isRemoved = postService.removePost(id);
