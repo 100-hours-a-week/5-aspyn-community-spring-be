@@ -101,12 +101,12 @@ public class UserService {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // 비밀번호 수정
+    // 비밀번호 변경
     public boolean modifyPassword(UserRequestDto userRequestDto) {
 
         User user = new User();
         user.setId(userRequestDto.getId());
-        user.setPassword(userRequestDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
 
         return userDAO.modifyPassword(user);
     }

@@ -77,14 +77,14 @@ public class UserController {
         return userService.logout(request);
     }
 
-    // 비밀번호 수정
+    // 비밀번호 변경
     @PatchMapping("/password")
-    public ResponseEntity<Boolean> modifyPassword (@RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<Boolean> modifyPassword (@RequestPart(value="request") UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.modifyPassword(userRequestDto));
     }
 
-    // 닉네임 및 프로필 이미지 수정
-    @PatchMapping(value = "/nickname", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // 닉네임 및 프로필 이미지 변경
+    @PatchMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> modifyNickname (
             @RequestPart(value="request") UserRequestDto userRequestDto,
             @RequestPart(value="file", required = false) MultipartFile profileImage
