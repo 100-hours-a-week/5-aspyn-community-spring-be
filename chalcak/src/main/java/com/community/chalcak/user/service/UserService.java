@@ -1,16 +1,17 @@
 package com.community.chalcak.user.service;
 
+import com.community.chalcak.comment.dao.CommentDao;
+import com.community.chalcak.post.dao.PostDao;
 import com.community.chalcak.user.dao.UserDao;
 import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.dto.UserResponseDto;
 import com.community.chalcak.user.entity.User;
 import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.image.service.S3Service;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,14 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserDao userDAO;
     private final S3Service s3Service;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final PostDao postDao;
+    private final CommentDao commentDao;
 
     /**
      * 회원가입
@@ -189,32 +194,55 @@ public class UserService {
     }
 
     // 회원탈퇴
-    public ResponseEntity<Map<String, Object>> leaveUser(UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
-        User user = new User();
-        user.setId(userRequestDto.getId());
+    @Transactional
+    public ResponseEntity<Map<String, Object>> leaveUser(Long userId) {
 
-        Map<String,Object> result = userDAO.leaveUser(user);
+        Map<String, Object> result = new HashMap<>();
 
-        if ("SUCCESS".equals(result.get("status"))){
-            // 세션 무효화
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
+        try {
+        // 유저 프로필 이미지 주소 가져오기
+        Map<String, Object> user = userDAO.getUserInfo(userId);
+        String profileUrl = (String) user.get("profile_url");
+
+        // 게시글 이미지 주소 가져오기 (list)
+        List<String> postImgUrls = postDao.getPostImgUrlsByUserId(userId);
+
+        // 회원 탈퇴 (유저 활성상태 업데이트 및 프로필 url null 처리)
+        Map<String,Object> userLeave = userDAO.leaveUser(userId);
+
+        // 게시글 삭제
+        int removePosts = postDao.removeLeaveUserPosts(userId);
+
+        // 댓글 삭제
+        commentDao.removeLeavecomment(userId);
+
+        // s3에 저장된 프로필 이미지 삭제
+        if (profileUrl != null) {
+            try{
+                s3Service.deleteImage(profileUrl);
+            } catch (Exception e) {
+                log.error("S3 프로필 이미지 삭제 실패: {}", profileUrl, e);
             }
+        }
 
-            // 쿠키 삭제
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    cookie.setMaxAge(0);
-                    cookie.setPath("/"); // 필요에 따라 경로를 수정합니다.
-                    response.addCookie(cookie);
+        // 게시글 이미지 삭제 (list)
+        if (removePosts > 0 && postImgUrls != null && !postImgUrls.isEmpty()) {
+            for (String postImgUrl : postImgUrls) {
+                try{
+                    s3Service.deleteImage(postImgUrl);
+                } catch (Exception e) {
+                    log.error("S3 게시글 이미지 삭제 실패: {}", postImgUrl, e);
                 }
             }
-
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(result,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        result.put("status", "SUCCESS");
+        result.put("message", "회원탈퇴가 완료되었습니다.");
+        return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("회원탈퇴 처리 중 오류 발생", e);
+            result.put("status", "ERROR");
+            result.put("message", "회원탈퇴 처리 중 오류가 발생했습니다.");
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

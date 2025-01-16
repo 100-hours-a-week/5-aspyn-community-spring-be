@@ -120,21 +120,14 @@ public class UserDao {
     }
 
     // 회원탈퇴
-    @Transactional
-    public Map<String, Object> leaveUser (User user) {
-        String sql1 = "UPDATE user SET deleted_at = now() WHERE id = ?";
-        String sql2 = "UPDATE post SET deleted_at = now() WHERE id = ? AND deleted_at IS null";
-        String sql3 = "UPDATE comments SET deleted_at = now() WHERE id = ? AND deleted_at IS null";
+    public Map<String, Object> leaveUser (Long userId) {
+        String sql1 = "UPDATE user SET deleted_at = now(), profile_url = null WHERE id = ?";
 
         Map<String, Object> result = new HashMap<>();
 
         try {
             // 유저 상태 업데이트
-            int result1 = jdbcTemplate.update(sql1, user.getId());
-            // 게시글 상태 업데이트
-            int result2 = jdbcTemplate.update(sql2, user.getId());
-            // 댓글 상태 업데이트
-            int result3 = jdbcTemplate.update(sql3, user.getId());
+            int result1 = jdbcTemplate.update(sql1, userId);
 
             result.put("status", "SUCCESS");
             result.put("message", "회원탈퇴가 완료되었습니다.");

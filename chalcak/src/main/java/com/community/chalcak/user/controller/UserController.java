@@ -1,5 +1,6 @@
 package com.community.chalcak.user.controller;
 
+import com.community.chalcak.jwt.JWTUtil;
 import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.user.service.UserService;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final JWTUtil jwtUtil;
     private final UserService userService;
 
     //회원가입
@@ -99,7 +101,7 @@ public class UserController {
     }
 
     // 유저 정보 조회
-    @GetMapping("/login/{id}") // info로 수정
+    @GetMapping("/login/{id}")
     public ResponseEntity<Map<String, Object>> loginUser(@PathVariable long id) {
 
         return userService.loginUser(id);
@@ -114,7 +116,40 @@ public class UserController {
 
     // 회원탈퇴
     @DeleteMapping("/leave")
-    public ResponseEntity<Map<String, Object>> leaveUser(@RequestBody UserRequestDto userRequestDto, HttpServletRequest request, HttpServletResponse response) {
-        return userService.leaveUser(userRequestDto, request, response);
+    public ResponseEntity<Map<String, Object>> leaveUser(@RequestHeader("Authorization") String token) {
+        System.out.println("회원탈퇴 api 호출");
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Bearer 접두사 제거
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            // jwt에서 userId 추출
+            Long userId = jwtUtil.getUserId(token);
+
+            // 회원탈퇴
+            ResponseEntity<Map<String, Object>> result = userService.leaveUser(userId);
+
+            // 성공 응답
+            if (result.getStatusCode().is2xxSuccessful()) {
+                response.put("status", "SUCCESS");
+                response.put("message", "회원탈퇴가 완료되었습니다.");
+                System.out.println("회원탈퇴 완료");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("status", "ERROR");
+                response.put("message", result.getBody().get("message"));
+                System.out.println("회원탈퇴 오류");
+                return new ResponseEntity<>(response, result.getStatusCode());
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "ERROR");
+            errorResponse.put("message", "회원탈퇴 처리 중 오류가 발생했습니다.");
+            errorResponse.put("error", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

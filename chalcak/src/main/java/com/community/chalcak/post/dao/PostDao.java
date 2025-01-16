@@ -173,7 +173,7 @@ public class PostDao {
         return result > 0;
     }
 
-    // 게시글 삭제
+    // 게시글 삭제(미노출)
     public boolean removePost(long id) {
         String sql = "UPDATE post SET deleted_at = now() WHERE id = ?";
 
@@ -181,4 +181,18 @@ public class PostDao {
 
         return result > 0;
     }
+
+    // 탈퇴 회원 게시글 이미지 url 조회
+    public List<String> getPostImgUrlsByUserId(long userId) {
+        String sql = "SELECT img_url FROM post WHERE user_id = ? and deleted_at IS NULL";
+        return jdbcTemplate.queryForList(sql, String.class, userId);
+    }
+
+    // 탈퇴 회원 게시글 삭제(미노출)
+    public int removeLeaveUserPosts(long userId) {
+        String sql = "UPDATE post SET deleted_at = now(), img_url = ' ' WHERE user_id = ? and deleted_at IS NULL";
+        int result = jdbcTemplate.update(sql,userId);
+        return result;
+    }
+
 }

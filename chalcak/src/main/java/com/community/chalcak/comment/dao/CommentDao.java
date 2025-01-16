@@ -35,7 +35,7 @@ public class CommentDao {
         return result > 0 ;
     }
 
-    // 댓글 삭제
+    // 댓글 삭제 (미노출)
     public boolean removeCmt(long id) {
         String sql = "UPDATE comments SET deleted_at = now() " +
                 " WHERE id = ?";
@@ -43,6 +43,12 @@ public class CommentDao {
         int result = jdbcTemplate.update(sql,id);
 
         return result > 0;
+    }
+
+    // 탈퇴회원 댓글 삭제 (미노출)
+    public void removeLeavecomment(long userId) {
+        String sql = "UPDATE comments SET deleted_at = now() WHERE user_id = ? and deleted_at IS NULL";
+        jdbcTemplate.update(sql,userId);
     }
 
 }
