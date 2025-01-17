@@ -85,7 +85,6 @@ public class PostService {
         post.setIso(postDto.getIso());
 
         return postDao.insertPost(post);
-
     }
 
     // 게시글 수정
@@ -117,22 +116,21 @@ public class PostService {
         post.setUserId(postDto.getUserId()); // 작성자
 
         return postDao.modifyPost(post);
-
     }
 
-    // 게시글 삭제
+    // 단일 게시글 삭제
     public boolean removePost(long id) {
         return postDao.removePost(id);
     }
 
-
-    //회원탈퇴
-    @Transactional
-    public void deleteMember() {
-//        1. 탈퇴회원 게시글 삭제 postDao
-//        2. 탈퇴회원 댓글 삭제 postDao
-//        3. 회원 삭제 userDao
-
-        // return type int return value 회원id
+    // 특정 유저의 모든 게시글 이미지 주소 가져오기
+    public List<String> getPostImgUrlsByUserId(long userId) {
+        return postDao.getPostImgUrlsByUserId(userId);
     }
+
+    // 특정 유저의 모든 게시글 일괄 삭제
+    public int removeLeaveUserPosts(long userId) {
+        return postDao.removeLeaveUserPosts(userId);
+    }
+
 }

@@ -65,4 +65,9 @@ public class CommentService {
     public boolean removeCmt(int seq) {
         return commentDao.removeCmt(seq);
     }
+
+    // 탈퇴 유저의 모든 댓글 일괄 삭제
+    public void removeAllComments(long userId) {
+        commentDao.removeAllComments(userId);
+    }
 }

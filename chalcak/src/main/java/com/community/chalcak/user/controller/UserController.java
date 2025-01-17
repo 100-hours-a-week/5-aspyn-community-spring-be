@@ -1,6 +1,7 @@
 package com.community.chalcak.user.controller;
 
 import com.community.chalcak.jwt.JWTUtil;
+import com.community.chalcak.user.dto.CustomUserDetails;
 import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.user.service.UserService;
@@ -8,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -116,19 +118,12 @@ public class UserController {
 
     // 회원탈퇴
     @DeleteMapping("/leave")
-    public ResponseEntity<Map<String, Object>> leaveUser(@RequestHeader("Authorization") String token) {
-        System.out.println("회원탈퇴 api 호출");
+    public ResponseEntity<Map<String, Object>> leaveUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Bearer 접두사 제거
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-
-            // jwt에서 userId 추출
-            Long userId = jwtUtil.getUserId(token);
-
+            // 회원탈퇴하려는 유저
+            Long userId = customUserDetails.getUserId();
             // 회원탈퇴
             ResponseEntity<Map<String, Object>> result = userService.leaveUser(userId);
 

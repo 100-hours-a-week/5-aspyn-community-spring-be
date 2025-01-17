@@ -46,7 +46,7 @@ public class CommentDao {
     }
 
     // 탈퇴회원 댓글 삭제 (미노출)
-    public void removeLeavecomment(long userId) {
+    public void removeAllComments(long userId) {
         String sql = "UPDATE comments SET deleted_at = now() WHERE user_id = ? and deleted_at IS NULL";
         jdbcTemplate.update(sql,userId);
     }

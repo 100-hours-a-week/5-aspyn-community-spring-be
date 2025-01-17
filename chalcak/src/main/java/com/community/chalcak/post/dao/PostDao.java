@@ -173,7 +173,7 @@ public class PostDao {
         return result > 0;
     }
 
-    // 게시글 삭제(미노출)
+    // 단일 게시글 삭제(미노출)
     public boolean removePost(long id) {
         String sql = "UPDATE post SET deleted_at = now() WHERE id = ?";
 

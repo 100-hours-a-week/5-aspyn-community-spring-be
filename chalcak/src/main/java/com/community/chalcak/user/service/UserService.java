@@ -1,7 +1,7 @@
 package com.community.chalcak.user.service;
 
-import com.community.chalcak.comment.dao.CommentDao;
-import com.community.chalcak.post.dao.PostDao;
+import com.community.chalcak.comment.service.CommentService;
+import com.community.chalcak.post.service.PostService;
 import com.community.chalcak.user.dao.UserDao;
 import com.community.chalcak.user.dto.JoinDto;
 import com.community.chalcak.user.dto.UserResponseDto;
@@ -31,8 +31,8 @@ public class UserService {
     private final UserDao userDAO;
     private final S3Service s3Service;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final PostDao postDao;
-    private final CommentDao commentDao;
+    private final PostService postService;
+    private final CommentService commentService;
 
     /**
      * 회원가입
@@ -205,16 +205,16 @@ public class UserService {
         String profileUrl = (String) user.get("profile_url");
 
         // 게시글 이미지 주소 가져오기 (list)
-        List<String> postImgUrls = postDao.getPostImgUrlsByUserId(userId);
+        List<String> postImgUrls = postService.getPostImgUrlsByUserId(userId);
 
         // 회원 탈퇴 (유저 활성상태 업데이트 및 프로필 url null 처리)
         Map<String,Object> userLeave = userDAO.leaveUser(userId);
 
         // 게시글 삭제
-        int removePosts = postDao.removeLeaveUserPosts(userId);
+        int removePosts = postService.removeLeaveUserPosts(userId);
 
         // 댓글 삭제
-        commentDao.removeLeavecomment(userId);
+        commentService.removeAllComments(userId);
 
         // s3에 저장된 프로필 이미지 삭제
         if (profileUrl != null) {
