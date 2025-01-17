@@ -173,12 +173,21 @@ public class PostDao {
         return result > 0;
     }
 
+    // 단일 게시글 이미지 주소 가져오기
+    public String getPostImgurl (long id) {
+        String sql = "SELECT img_url FROM post WHERE id = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, String.class, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null; // 데이터가 없으면 null 반환
+        }
+    }
+
     // 단일 게시글 삭제(미노출)
     public boolean removePost(long id) {
-        String sql = "UPDATE post SET deleted_at = now() WHERE id = ?";
-
+        String sql = "UPDATE post SET deleted_at = now(), img_url = ' ' WHERE id = ?";
         int result = jdbcTemplate.update(sql,id);
-
         return result > 0;
     }
 

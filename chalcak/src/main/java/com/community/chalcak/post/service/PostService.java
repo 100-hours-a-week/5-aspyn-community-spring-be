@@ -120,7 +120,23 @@ public class PostService {
 
     // 단일 게시글 삭제
     public boolean removePost(long id) {
-        return postDao.removePost(id);
+        // 게시글 이미지 주소
+        String imgUrl = postDao.getPostImgurl(id);
+
+        if (imgUrl == null) {
+            // 해당 게시글 이미지가 없으면 false 반환
+            return false;
+        }
+
+        // 게시글 삭제 처리
+        boolean remove = postDao.removePost(id);
+
+        if (remove) {
+            // s3에 해당 게시글 이미지 삭제
+            s3Service.deleteImage(imgUrl);
+            return true;
+        }
+        return false;
     }
 
     // 특정 유저의 모든 게시글 이미지 주소 가져오기
