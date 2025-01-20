@@ -50,17 +50,17 @@ public class UserDao {
     }
 
     // 비밀번호 수정
-    public boolean modifyPassword(User user) {
+    public boolean modifyPassword(long userId, String newPassword) {
         String sql = "UPDATE user SET password = ? WHERE id = ?";
 
-        int result = jdbcTemplate.update(sql, user.getPassword(), user.getId());
+        int result = jdbcTemplate.update(sql, newPassword, userId);
         return result > 0 ;
     }
 
     // 프로필 url 조회
-    public Map<String, Object> getProfileUrl(long id) {
+    public String getProfileUrl(long id) {
         String sql = "SELECT profile_url FROM user WHERE id = ?";
-        return jdbcTemplate.queryForMap(sql, id);
+        return jdbcTemplate.queryForObject(sql,String.class, id);
     }
 
     // 닉네임, 프로필 이미지 변경

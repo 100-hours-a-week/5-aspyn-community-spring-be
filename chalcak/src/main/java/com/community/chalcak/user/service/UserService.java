@@ -3,13 +3,9 @@ package com.community.chalcak.user.service;
 import com.community.chalcak.comment.service.CommentService;
 import com.community.chalcak.post.service.PostService;
 import com.community.chalcak.user.dao.UserDao;
-import com.community.chalcak.user.dto.JoinDto;
-import com.community.chalcak.user.dto.UserResponseDto;
+import com.community.chalcak.user.dto.*;
 import com.community.chalcak.user.entity.User;
-import com.community.chalcak.user.dto.UserRequestDto;
 import com.community.chalcak.image.service.S3Service;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,79 +57,29 @@ public class UserService {
         return userDAO.insertUser(user);
     }
 
-    /**
-     * 로그인
-     *
-     * @param userRequestDTO
-     * @return Map<String, Object>
-     * */
-    public Map<String, Object> login(UserRequestDto userRequestDTO) {
-        Map<String, Object> result = new HashMap<>();
-
-        // 로그인 시도 이메일과 db 정보 대조하여 데이터 가져옴
-        User dbUser = userDAO.findByUsername(userRequestDTO.getEmail());
-        // TODO: 비밀번호 검증 수정 필요
-        //  해시 알고리즘 사용 또는 다른 방법
-        if (dbUser == null) {
-            result.put("status", "ERROR");
-            result.put("message", "존재하지 않는 이메일입니다.");
-        } else if (dbUser.getDeletedAt() != null) {
-            result.put("status", "ERROR");
-            result.put("message", "탈퇴한 계정입니다.");
-        } else if (!dbUser.getPassword().equals(userRequestDTO.getPassword())){
-            result.put("status", "ERROR");
-            result.put("message", "비밀번호가 일치하지 않습니다.");
-        } else {
-            // 로그인 성공
-            result.put("status", "SUCCESS");
-            result.put("user", dbUser);
-        }
-        return result;
-    }
-
-    // 로그아웃
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
-        Map<String, Object> result = new HashMap<>();
-
-        // 세션 무효화
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-
-        result.put("status", "SUCCESS");
-        result.put("message", "로그아웃이 성공적으로 처리되었습니다.");
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
     // 비밀번호 변경
-    public boolean modifyPassword(UserRequestDto userRequestDto) {
-
-        User user = new User();
-        user.setId(userRequestDto.getId());
-        user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
-
-        return userDAO.modifyPassword(user);
+    public boolean modifyPassword(long userId, RequestChangePwDto requestChangePwDto) {
+        String newPassword = passwordEncoder.encode(requestChangePwDto.getPassword());
+        return userDAO.modifyPassword(userId, newPassword);
     }
 
     // 닉네임 및 프로필 이미지 수정
     @Transactional
-    public boolean modifyInfo(UserRequestDto userRequestDto, MultipartFile profileImage) throws IOException {
+    public boolean modifyInfo(long userId, RequestChangeInfoDto requestChangeInfoDto, MultipartFile profileImage) throws IOException {
 
         User user = new User();
-        user.setId(userRequestDto.getId());
-        user.setNickname(userRequestDto.getNickname());
+        user.setId(userId);
+        user.setNickname(requestChangeInfoDto.getNickname());
 
         String preProfileUrl = null;
+        // 변경할 프로필 이미지가 있는 경우
         if (profileImage != null) {
             // 기존 프로필 url 조회
-            Map<String,Object> result = userDAO.getProfileUrl(user.getId());
-            if (result.get("profile_url") != null) {
-                preProfileUrl = result.get("profile_url").toString();
-            }
+            preProfileUrl = userDAO.getProfileUrl(user.getId());
 
             // 새로운 프로필 s3 업로드
             String newProfileUrl = s3Service.uploadImage(profileImage, "profile/");
+
             // 엔티티에 새로운 프로필 url 삽입
             user.setProfileUrl(newProfileUrl);
         }
@@ -141,11 +87,9 @@ public class UserService {
         // 프로필 및 닉네임 변경사항 DB 저장
         boolean modifyInfo = userDAO.modifyInfo(user);
 
-        if (profileImage != null) {
-            if (preProfileUrl != null) {
-                // 기존 프로필 이미지 S3에서 삭제
-                s3Service.deleteImage(preProfileUrl);
-            }
+        // 기존 프로필 이미지 s3에서 삭제
+        if (modifyInfo && preProfileUrl != null) {
+            s3Service.deleteImage(preProfileUrl);
         }
 
         return modifyInfo;
@@ -164,27 +108,11 @@ public class UserService {
         return userDAO.checkEmail(email); // true 일시 중복 이메일 존재
     }
 
-    // 유저 정보 조회
-    public ResponseEntity<Map<String, Object>> loginUser(long id) {
-        Map<String, Object> response = new HashMap<>();
-        Map<String, Object> result = userDAO.getUserInfo(id);
-
-        if (result == null) {
-            response.put("message", "유저를 찾을 수 없습니다.");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } else {
-            response.put("id", result.get("id"));
-            response.put("email", result.get("email"));
-            response.put("nickname", result.get("nickname"));
-            response.put("profileUrl", result.get("profile_url"));
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-    }
-
-    public UserResponseDto getUserInfo(long id) {
+    // 유저 정보 가져오기
+    public ResponseUserDto getUserInfo(long id) {
         Map<String, Object> user = userDAO.getUserInfo(id);
 
-        UserResponseDto userDto = new UserResponseDto();
+        ResponseUserDto userDto = new ResponseUserDto();
         userDto.setId((Long) user.get("id"));
         userDto.setEmail(user.get("email").toString());
         userDto.setNickname(user.get("nickname").toString());
@@ -201,8 +129,7 @@ public class UserService {
 
         try {
         // 유저 프로필 이미지 주소 가져오기
-        Map<String, Object> user = userDAO.getUserInfo(userId);
-        String profileUrl = (String) user.get("profile_url");
+        String profileUrl = userDAO.getProfileUrl(userId);
 
         // 게시글 이미지 주소 가져오기 (list)
         List<String> postImgUrls = postService.getPostImgUrlsByUserId(userId);

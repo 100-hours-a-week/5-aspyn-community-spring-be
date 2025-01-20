@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter @Setter
-public class UserResponseDto {
+public class ResponseUserDto {
     private long id;
     private String email;
     private String nickname;

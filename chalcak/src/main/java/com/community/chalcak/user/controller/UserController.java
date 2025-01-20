@@ -1,12 +1,8 @@
 package com.community.chalcak.user.controller;
 
 import com.community.chalcak.jwt.JWTUtil;
-import com.community.chalcak.user.dto.CustomUserDetails;
-import com.community.chalcak.user.dto.JoinDto;
-import com.community.chalcak.user.dto.UserRequestDto;
+import com.community.chalcak.user.dto.*;
 import com.community.chalcak.user.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -75,45 +71,28 @@ public class UserController {
         }
     }
 
-    // 로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request, HttpServletResponse response) {
-        return userService.logout(request);
-    }
-
     // 비밀번호 변경
     @PatchMapping("/password")
-    public ResponseEntity<Boolean> modifyPassword (@RequestPart(value="request") UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userService.modifyPassword(userRequestDto));
+    public ResponseEntity<Boolean> modifyPassword (@RequestPart(value="request")RequestChangePwDto requestChangePwDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.modifyPassword(userId, requestChangePwDto));
     }
 
     // 닉네임 및 프로필 이미지 변경
     @PatchMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Boolean> modifyNickname (
-            @RequestPart(value="request") UserRequestDto userRequestDto,
-            @RequestPart(value="file", required = false) MultipartFile profileImage
+            @RequestPart(value="request")RequestChangeInfoDto requestChangeInfoDto,
+            @RequestPart(value="file", required = false) MultipartFile profileImage,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws IOException {
-        return ResponseEntity.ok(userService.modifyInfo(userRequestDto, profileImage));
+        long userId = userDetails.getUserId();
+        return ResponseEntity.ok(userService.modifyInfo(userId, requestChangeInfoDto, profileImage));
     }
 
     // 닉네임 중복 확인
     @GetMapping("/isExist/{nickname}")
     public ResponseEntity<Boolean> checkNickname(@PathVariable String nickname) {
         return ResponseEntity.ok(userService.checkNickname(nickname));
-    }
-
-    // 유저 정보 조회
-    @GetMapping("/login/{id}")
-    public ResponseEntity<Map<String, Object>> loginUser(@PathVariable long id) {
-
-        return userService.loginUser(id);
-    }
-
-    // 프로필 이미지 불러오기
-    @GetMapping("/profile/{userId}")
-    public ResponseEntity<Map<String, Object>> getProfileImage(@PathVariable long userId) {
-
-        return userService.loginUser(userId);
     }
 
     // 회원탈퇴

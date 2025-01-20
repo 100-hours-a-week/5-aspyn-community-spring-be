@@ -1,7 +1,7 @@
 package com.community.chalcak.user.controller;
 
 import com.community.chalcak.user.dto.CustomUserDetails;
-import com.community.chalcak.user.dto.UserResponseDto;
+import com.community.chalcak.user.dto.ResponseUserDto;
 import com.community.chalcak.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +21,6 @@ public class UserInfoController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
-    public String userUsingSession() {
-
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return "세션 현재 사용자 아이디 : " + name;
-    }
-
     @GetMapping("/api/userinfo")
     public ResponseEntity<Map<String, String>> getUserInfo() {
 
@@ -41,7 +33,7 @@ public class UserInfoController {
         System.out.println("jwt 인증 후 컨텍스트홀더에서 가져온 유저 id: " + userId);
 
         if (userId != null) {
-            UserResponseDto userDto = userService.getUserInfo(userId);
+            ResponseUserDto userDto = userService.getUserInfo(userId);
 
             Map<String, String> response = new HashMap<>();
             response.put("user_id", String.valueOf(userDto.getId()));
