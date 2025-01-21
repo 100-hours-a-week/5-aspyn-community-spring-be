@@ -186,7 +186,7 @@ public class PostDao {
 
     // 단일 게시글 삭제(미노출)
     public boolean removePost(long id) {
-        String sql = "UPDATE post SET deleted_at = now(), img_url = ' ' WHERE id = ?";
+        String sql = "UPDATE post SET deleted_at = now(), img_url = '-' WHERE id = ?";
         int result = jdbcTemplate.update(sql,id);
         return result > 0;
     }
@@ -199,7 +199,7 @@ public class PostDao {
 
     // 탈퇴 회원 게시글 삭제(미노출)
     public int removeLeaveUserPosts(long userId) {
-        String sql = "UPDATE post SET deleted_at = now(), img_url = ' ' WHERE user_id = ? and deleted_at IS NULL";
+        String sql = "UPDATE post SET deleted_at = now(), img_url = '-' WHERE user_id = ? and deleted_at IS NULL";
         int result = jdbcTemplate.update(sql,userId);
         return result;
     }
