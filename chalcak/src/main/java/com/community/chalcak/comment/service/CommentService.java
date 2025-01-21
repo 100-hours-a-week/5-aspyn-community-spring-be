@@ -1,8 +1,7 @@
 package com.community.chalcak.comment.service;
 
 import com.community.chalcak.comment.dao.CommentDao;
-import com.community.chalcak.comment.dto.CommentDto;
-import com.community.chalcak.comment.entitiy.Comment;
+import com.community.chalcak.comment.dto.RequestCommentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +16,16 @@ public class CommentService {
     private final CommentDao commentDao;
 
     // 댓글 등록
-    public boolean insertCmt(CommentDto commentDto) {
+    public boolean insertComment(long userId, RequestCommentDto commentDto) {
 
-        Comment comment = new Comment();
-        comment.setPostId(commentDto.getPostId());
-        comment.setText(commentDto.getText());
-        comment.setUserId(commentDto.getUserId());
+        long postId = commentDto.getPostId();
+        String text = commentDto.getText();
 
-        return commentDao.insertCmt(comment);
+        return commentDao.insertComment(postId, text, userId);
     }
 
     // 댓글 불러오기
-    public ResponseEntity<Map<String, Object>>getCmt(long id){
+    public ResponseEntity<Map<String, Object>>getComment(long id){
        try {
            Map<String,Object> cmtList = commentDao.getComment(id);
            // 댓글이 있으면 성공 응답 반환
@@ -52,18 +49,17 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public boolean modifyCmt(CommentDto commentDto) {
+    public boolean modifyComment(RequestCommentDto commentDto) {
 
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setText(commentDto.getText());
+        long commentId = commentDto.getId();
+        String newText = commentDto.getText();
 
-        return commentDao.modifyCmt(comment);
+        return commentDao.modifyComment(commentId, newText);
     }
 
     // 댓글 삭제
-    public boolean removeCmt(int seq) {
-        return commentDao.removeCmt(seq);
+    public boolean removeComment(int seq) {
+        return commentDao.removeComment(seq);
     }
 
     // 탈퇴 유저의 모든 댓글 일괄 삭제

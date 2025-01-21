@@ -1,6 +1,5 @@
 package com.community.chalcak.comment.dao;
 
-import com.community.chalcak.comment.entitiy.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,11 +12,11 @@ public class CommentDao {
     private final JdbcTemplate jdbcTemplate;
 
     // 댓글 등록
-    public boolean insertCmt(Comment comment) {
+    public boolean insertComment(long postId, String text, long userId) {
         String sql = "INSERT INTO comments (post_id, text, user_id) " +
                 "VALUES (?, ?, ?)";
 
-        int result = jdbcTemplate.update(sql,comment.getPostId(), comment.getText(), comment.getUserId());
+        int result = jdbcTemplate.update(sql,postId, text, userId);
         return result > 0;
     }
 
@@ -28,15 +27,15 @@ public class CommentDao {
     }
 
     // 댓글 수정
-    public boolean modifyCmt(Comment comment) {
+    public boolean modifyComment(long id, String text) {
         String sql = "UPDATE comments SET text = ?, updated_at = now() " +
                 " WHERE id = ?";
-        int result = jdbcTemplate.update(sql,comment.getText(), comment.getId());
+        int result = jdbcTemplate.update(sql,text, id);
         return result > 0 ;
     }
 
     // 댓글 삭제 (미노출)
-    public boolean removeCmt(long id) {
+    public boolean removeComment(long id) {
         String sql = "UPDATE comments SET deleted_at = now() " +
                 " WHERE id = ?";
 
