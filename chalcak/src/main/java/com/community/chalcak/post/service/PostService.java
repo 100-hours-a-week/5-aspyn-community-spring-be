@@ -2,9 +2,11 @@ package com.community.chalcak.post.service;
 
 import com.community.chalcak.image.service.S3Service;
 import com.community.chalcak.post.dao.PostDao;
+import com.community.chalcak.post.dto.PostResponseDto;
 import com.community.chalcak.post.entity.Post;
-import com.community.chalcak.post.dto.PostDto;
-import com.community.chalcak.post.entity.PostInfo;
+import com.community.chalcak.post.dto.PostRequestDto;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,18 @@ public class PostService {
     private final PostDao postDao;
     private final S3Service s3Service;
 
+    @Getter
+    @AllArgsConstructor
+    public static class PagedPosts {
+        private List<PostResponseDto> posts;
+        private long totalElements;
+        private int totalPages;
+    }
+
     // 게시글 목록 조회
     public Map<String, Object> getAllPosts() {
         Map<String, Object> result = new HashMap<>();
-        List<PostInfo> allPosts = postDao.findAllPosts();
+        List<Post> allPosts = postDao.findAllPosts();
 
 //        log.debug("#### 게시글 목록 조회");
         if (allPosts == null) {
@@ -41,16 +51,53 @@ public class PostService {
         return result;
     }
 
+    public PagedPosts getPagedPosts (int page, int size) {
+        int offset = page * size; // 페이징 시작 위치
+        List<Post> pagedPosts = postDao.findPostsByPage(offset, size);
+
+        // 게시글 개수
+        long totalElements = postDao.countAllPosts();
+
+        // 전체 페이지 계산
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        // 엔티티를 DTO로 변환
+        List<PostResponseDto> postResponseDtos = pagedPosts.stream()
+                .map(this::convertToPostResponseDto)
+                .toList();
+
+        return new PagedPosts(postResponseDtos, totalElements, totalPages);
+    }
+
+    // 엔티티를 DTO로 변환하는 메서드
+    private PostResponseDto convertToPostResponseDto(Post post) {
+        PostResponseDto dto = new PostResponseDto();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setText(post.getText());
+        dto.setImgUrl(post.getImgUrl());
+        dto.setIris(post.getIris());
+        dto.setShutterSpeed(post.getShutterSpeed());
+        dto.setIso(post.getIso());
+        dto.setUpdatedAt(post.getUpdatedAt());
+        dto.setDeletedAt(post.getDeletedAt());
+        dto.setUserId(post.getUserId());
+        dto.setNickname(post.getNickname());
+        dto.setProfileUrl(post.getProfileUrl());
+        dto.setComments(post.getComments()); // 댓글 리스트도 설정
+        return dto;
+    }
+
     // 특정 게시글 상세 조회 (게시글+댓글)
     public Map<String, Object> getPost(long id) {
         Map<String, Object> result = new HashMap<>();
-        Optional<PostInfo> postOptional = postDao.getPost(id);
+        Optional<Post> postOptional = postDao.getPost(id);
 
         if (!postOptional.isPresent()) {
             result.put("status", "ERROR");
             result.put("message", "게시글이 존재하지 않습니다.");
         } else {
-            PostInfo dbPost = postOptional.get();
+            Post dbPost = postOptional.get();
             if (dbPost.getDeletedAt() != null) {
                 result.put("status", "ERROR");
                 result.put("message", "삭제된 게시글입니다.");
@@ -63,36 +110,46 @@ public class PostService {
     }
 
     // 특정 게시글만 불러오기
-    public Post getOnlyPost(long id) {
-        return postDao.getOnlyPost(id);
+    public Map<String, Object> getPostOnly(long id) {
+        Post post = postDao.getOnlyPost(id);
+        Map<String, Object> result = new HashMap<>();
+
+        if (post == null) {
+            result.put("status", "ERROR");
+            result.put("message", "게시글이 존재하지 않습니다.");
+        } else {
+            result.put("status", "SUCCESS");
+            result.put("post", post);
+        }
+        return result;
     }
 
     // 신규 게시글 등록
     @Transactional
-    public int newPost(PostDto postDto, MultipartFile image) throws IOException {
+    public int newPost(PostRequestDto postRequestDto, MultipartFile image) throws IOException {
 
         // 이미지 S3에 업로드
         String imageUrl = s3Service.uploadImage(image, "post/");
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
-        post.setUserId(postDto.getUserId());
-        post.setTitle(postDto.getTitle());
-        post.setText(postDto.getText());
+        post.setUserId(postRequestDto.getUserId());
+        post.setTitle(postRequestDto.getTitle());
+        post.setText(postRequestDto.getText());
         post.setImgUrl(imageUrl);
-        post.setIris(postDto.getIris());
-        post.setShutterSpeed(postDto.getShutterSpeed());
-        post.setIso(postDto.getIso());
+        post.setIris(postRequestDto.getIris());
+        post.setShutterSpeed(postRequestDto.getShutterSpeed());
+        post.setIso(postRequestDto.getIso());
 
         return postDao.insertPost(post);
     }
 
     // 게시글 수정
-    public boolean modifyPost(PostDto postDto) {
+    public boolean modifyPost(PostRequestDto postRequestDto) {
 
-        long userId = postDto.getUserId();
-        System.out.println(postDto.getId());
-        Post prePost = postDao.getOnlyPost(postDto.getId());
+        long userId = postRequestDto.getUserId();
+        System.out.println(postRequestDto.getId());
+        Post prePost = postDao.getOnlyPost(postRequestDto.getId());
 
         System.out.println(prePost);
         long postWriter = prePost.getUserId();
@@ -102,18 +159,18 @@ public class PostService {
             return false;
         }
 
-        System.out.println(postDto.getShutterSpeed());
-        System.out.println(postDto.getText());
+        System.out.println(postRequestDto.getShutterSpeed());
+        System.out.println(postRequestDto.getText());
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
-        post.setId(postDto.getId());
-        post.setTitle(postDto.getTitle());
-        post.setText(postDto.getText());
-        post.setIris(postDto.getIris());
-        post.setShutterSpeed(postDto.getShutterSpeed());
-        post.setIso(postDto.getIso());
-        post.setUserId(postDto.getUserId()); // 작성자
+        post.setId(postRequestDto.getId());
+        post.setTitle(postRequestDto.getTitle());
+        post.setText(postRequestDto.getText());
+        post.setIris(postRequestDto.getIris());
+        post.setShutterSpeed(postRequestDto.getShutterSpeed());
+        post.setIso(postRequestDto.getIso());
+        post.setUserId(postRequestDto.getUserId()); // 작성자
 
         return postDao.modifyPost(post);
     }

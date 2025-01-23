@@ -5,11 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
-@Getter @Setter
-public class PostDto {
+@Getter
+@Setter
+public class PostResponseDto {
     private long id;
     private String title;
     private String text;

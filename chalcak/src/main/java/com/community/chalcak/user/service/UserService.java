@@ -63,6 +63,11 @@ public class UserService {
         return userDAO.modifyPassword(userId, newPassword);
     }
 
+    // 프로필 이미지 주소 조회
+    public String getProfileUrl(long userId) {
+        return userDAO.getProfileUrl(userId);
+    }
+
     // 닉네임 및 프로필 이미지 수정
     @Transactional
     public boolean modifyInfo(long userId, RequestChangeInfoDto requestChangeInfoDto, MultipartFile profileImage) throws IOException {

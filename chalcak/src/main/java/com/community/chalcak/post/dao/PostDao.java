@@ -2,7 +2,6 @@ package com.community.chalcak.post.dao;
 
 import com.community.chalcak.comment.entitiy.Comment;
 import com.community.chalcak.post.entity.Post;
-import com.community.chalcak.post.entity.PostInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,26 +37,6 @@ public class PostDao {
             post.setIso(rs.getString("iso"));
             post.setUpdatedAt(rs.getTimestamp("updated_at"));
             post.setUserId(rs.getInt("user_id"));
-//            post.setNickname(rs.getString("nickname"));
-//            post.setProfileUrl(rs.getString("profile_url"));
-            return post;
-        }
-    }
-
-    // postInfo 객체에 값 삽입
-    private static class PostInfoRowMapper implements RowMapper<PostInfo> {
-        @Override
-        public PostInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            PostInfo post = new PostInfo();
-            post.setId(rs.getInt("id"));
-            post.setTitle(rs.getString("title"));
-            post.setText(rs.getString("text"));
-            post.setImgUrl(rs.getString("img_url"));
-            post.setIris(rs.getString("iris"));
-            post.setShutterSpeed(rs.getString("shutter_speed"));
-            post.setIso(rs.getString("iso"));
-            post.setUpdatedAt(rs.getTimestamp("updated_at"));
-            post.setUserId(rs.getInt("user_id"));
             post.setNickname(rs.getString("nickname"));
             post.setProfileUrl(rs.getString("profile_url"));
             return post;
@@ -65,26 +44,45 @@ public class PostDao {
     }
 
     // 전체 게시글 조회
-    public List<PostInfo> findAllPosts() {
+    public List<Post> findAllPosts() {
         String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, " +
                 "p.updated_at, p.user_id, u.nickname, u.profile_url " +
                 "FROM post p JOIN user u ON u.id = p.user_id " +
                 "WHERE p.deleted_at IS NULL";
-//        String sql2 = "SELECT p.*, u.nickname, u.profile_url " +
-//                "FROM post p JOIN user u ON u.id = p.user_id " +
-//                "WHERE p.deleted_at IS NULL";
 
         try {
-            return jdbcTemplate.query(sql, new PostInfoRowMapper());
+            return jdbcTemplate.query(sql, new PostRowMapper());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
+    // 페이지네이션
+    public List<Post> findPostsByPage(int offset, int limit) {
+        String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, " +
+                "p.updated_at, p.user_id, u.nickname, u.profile_url " +
+                "FROM post p JOIN user u ON u.id = p.user_id " +
+                "WHERE p.deleted_at IS NULL ORDER BY p.id DESC LiMIT ? OFFSET ?";
+
+        try {
+            return jdbcTemplate.query(sql, new PostRowMapper(), limit, offset);
+        } catch (EmptyResultDataAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 게시글 개수(삭제되지 않은 건)
+    public long countAllPosts() {
+        String sql = "SELECT COUNT(*) FROM post WHERE deleted_at IS NULL";
+        return jdbcTemplate.queryForObject(sql, Long.class);
+    }
+
     // 특정 게시글만 조회
     public Post getOnlyPost(long id) {
-        String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id FROM post  WHERE id = ?";
+        String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id " +
+                "FROM post  WHERE id = ? and deleted_at IS NULL";
 
         try {
             return jdbcTemplate.queryForObject(sql, new PostRowMapper(), id);
@@ -95,7 +93,7 @@ public class PostDao {
     }
 
     // 특정 게시글 및 댓글 조회
-    public Optional<PostInfo> getPost(long id) {
+    public Optional<Post> getPost(long id) {
         String sql =
                 "SELECT p.*, u.nickname, u.profile_url, u.deleted_at FROM post p" +
                 " JOIN user u ON p.user_id = u.id " +
@@ -106,7 +104,7 @@ public class PostDao {
         try {
             return jdbcTemplate.query(sql, new Object[]{id}, rs -> {
                 if (rs.next()) {
-                    PostInfo postInfo = new PostInfo();
+                    Post postInfo = new Post();
                     postInfo.setId(rs.getLong("id"));
                     postInfo.setTitle(rs.getString("title"));
                     postInfo.setText(rs.getString("text"));

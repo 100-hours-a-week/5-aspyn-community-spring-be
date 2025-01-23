@@ -20,7 +20,7 @@ public class Post {
     private Timestamp updatedAt;
     private Timestamp deletedAt;
     private long userId; // 작성 유저
-//    private String nickname;
-//    private String profileUrl;
+    private String nickname;
+    private String profileUrl;
     private List<Comment> comments; // 댓글 목록
 }

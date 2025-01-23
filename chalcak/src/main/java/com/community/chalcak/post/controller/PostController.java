@@ -1,7 +1,10 @@
 package com.community.chalcak.post.controller;
 
-import com.community.chalcak.post.dto.PostDto;
+import com.community.chalcak.post.dto.PostRequestDto;
+import com.community.chalcak.post.dto.PostGetDto;
+import com.community.chalcak.post.dto.PostPageResponseDto;
 import com.community.chalcak.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,24 +25,50 @@ public class PostController {
     private final PostService postService;
 
     // 게시글 전체 조회
-    @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> retrieveAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    // 특정 게시글 조회
+    // 게시글 페이지네이션 조회
+    @GetMapping("/list")
+    public ResponseEntity<PostPageResponseDto> getPostList(@Valid PostGetDto postGetDto) {
+        int page = postGetDto.getPage() - 1; // 페이지 번호 0부터 시작
+        int size = postGetDto.getSize();
+        PostService.PagedPosts pagedPosts = postService.getPagedPosts(page, size);
+
+        // PostPageResponseDto 생성
+        PostPageResponseDto response = PostPageResponseDto.builder()
+                .data(pagedPosts.getPosts())
+                .pageInfo(PostPageResponseDto.PageInfo.builder()
+                        .page(page)
+                        .size(size)
+                        .totalElements(pagedPosts.getTotalElements())
+                        .totalPages(pagedPosts.getTotalPages())
+                        .build())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 특정 게시글 조회 (게시글 + 댓글)
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getPost(@PathVariable("id") int id) {
         return ResponseEntity.ok(postService.getPost(id));
     }
 
+    // 특정 게시글만 조회 (게시글 only)
+    @GetMapping("/{id}only")
+    public ResponseEntity<Map<String, Object>> getPostOnly(@PathVariable("id") int id) {
+        return ResponseEntity.ok(postService.getPostOnly(id));
+    }
+
     // 게시글 작성
     @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     public ResponseEntity<Map<String, String>> newPost(
-            @RequestPart(value = "file") MultipartFile image, @RequestPart(value = "request") PostDto postDto) throws IOException {
+            @RequestPart(value = "file") MultipartFile image, @RequestPart(value = "request") PostRequestDto postRequestDto) throws IOException {
         Map<String, String> response = new HashMap<>();
 
-        int newPostId = postService.newPost(postDto, image);
+        int newPostId = postService.newPost(postRequestDto, image);
 
         if(newPostId > 0) {
             response.put("message", "게시글 작성이 완료되었습니다.");
@@ -54,12 +83,12 @@ public class PostController {
     // 게시글 수정
     @Transactional
     @PatchMapping(value = "/{post}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-    public ResponseEntity<Map<String, String>> modifyPost(@RequestPart(value = "request") PostDto postDto) {
+    public ResponseEntity<Map<String, String>> modifyPost(@RequestPart(value = "request") PostRequestDto postRequestDto) {
         Map<String, String> response = new HashMap<>();
 
-        System.out.println(postDto);
+        System.out.println(postRequestDto);
 
-        boolean isModified = postService.modifyPost(postDto);
+        boolean isModified = postService.modifyPost(postRequestDto);
 
         if (isModified) {
             response.put("status", "SUCCESS");
