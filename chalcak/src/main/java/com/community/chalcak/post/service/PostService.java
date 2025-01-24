@@ -126,14 +126,14 @@ public class PostService {
 
     // 신규 게시글 등록
     @Transactional
-    public int newPost(PostRequestDto postRequestDto, MultipartFile image) throws IOException {
+    public int newPost(long userId, PostRequestDto postRequestDto, MultipartFile image) throws IOException {
 
         // 이미지 S3에 업로드
         String imageUrl = s3Service.uploadImage(image, "post/");
 
         //PostDto 객체를 Post 객체로 변환
         Post post = new Post();
-        post.setUserId(postRequestDto.getUserId());
+        post.setUserId(userId);
         post.setTitle(postRequestDto.getTitle());
         post.setText(postRequestDto.getText());
         post.setImgUrl(imageUrl);
@@ -145,13 +145,13 @@ public class PostService {
     }
 
     // 게시글 수정
-    public boolean modifyPost(PostRequestDto postRequestDto) {
+    public boolean modifyPost(long userId, PostRequestDto postRequestDto) {
 
-        long userId = postRequestDto.getUserId();
-        System.out.println(postRequestDto.getId());
+        System.out.println("로그인 유저: " + userId);
+        System.out.println("게시글 번호: " + postRequestDto.getId());
         Post prePost = postDao.getOnlyPost(postRequestDto.getId());
 
-        System.out.println(prePost);
+        System.out.println("이전 게시글 정보: " + prePost);
         long postWriter = prePost.getUserId();
 
         // 동일한 작성자인지 확인
@@ -170,7 +170,7 @@ public class PostService {
         post.setIris(postRequestDto.getIris());
         post.setShutterSpeed(postRequestDto.getShutterSpeed());
         post.setIso(postRequestDto.getIso());
-        post.setUserId(postRequestDto.getUserId()); // 작성자
+        post.setUserId(userId); // 작성자
 
         return postDao.modifyPost(post);
     }

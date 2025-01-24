@@ -4,11 +4,13 @@ import com.community.chalcak.post.dto.PostRequestDto;
 import com.community.chalcak.post.dto.PostGetDto;
 import com.community.chalcak.post.dto.PostPageResponseDto;
 import com.community.chalcak.post.service.PostService;
+import com.community.chalcak.user.dto.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,10 +67,12 @@ public class PostController {
     // 게시글 작성
     @PostMapping(value = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     public ResponseEntity<Map<String, String>> newPost(
-            @RequestPart(value = "file") MultipartFile image, @RequestPart(value = "request") PostRequestDto postRequestDto) throws IOException {
-        Map<String, String> response = new HashMap<>();
+            @RequestPart(value = "file") MultipartFile image, @RequestPart(value = "request") PostRequestDto postRequestDto, @AuthenticationPrincipal CustomUserDetails userDetails) throws IOException {
+        long userId = userDetails.getUserId();
+        System.out.println("POST REQUEST DTO: " + postRequestDto);
+        int newPostId = postService.newPost(userId, postRequestDto, image);
 
-        int newPostId = postService.newPost(postRequestDto, image);
+        Map<String, String> response = new HashMap<>();
 
         if(newPostId > 0) {
             response.put("message", "게시글 작성이 완료되었습니다.");
@@ -83,12 +87,13 @@ public class PostController {
     // 게시글 수정
     @Transactional
     @PatchMapping(value = "/{post}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
-    public ResponseEntity<Map<String, String>> modifyPost(@RequestPart(value = "request") PostRequestDto postRequestDto) {
+    public ResponseEntity<Map<String, String>> modifyPost(PostRequestDto postRequestDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, String> response = new HashMap<>();
 
         System.out.println(postRequestDto);
+        long userId = userDetails.getUserId();
 
-        boolean isModified = postService.modifyPost(postRequestDto);
+        boolean isModified = postService.modifyPost(userId, postRequestDto);
 
         if (isModified) {
             response.put("status", "SUCCESS");

@@ -81,8 +81,9 @@ public class PostDao {
 
     // 특정 게시글만 조회
     public Post getOnlyPost(long id) {
-        String sql = "SELECT Id, title, text, img_url, iris, shutter_speed, iso, updated_at, user_id " +
-                "FROM post  WHERE id = ? and deleted_at IS NULL";
+        String sql = "SELECT p.id, p.title, p.text, p.img_url, p.iris, p.shutter_speed, p.iso, p.updated_at, p.user_id, u.nickname, u.profile_url " +
+                "FROM post p JOIN user u ON p.user_id = u.id " +
+                "WHERE p.id = ? and p.deleted_at IS NULL";
 
         try {
             return jdbcTemplate.queryForObject(sql, new PostRowMapper(), id);
