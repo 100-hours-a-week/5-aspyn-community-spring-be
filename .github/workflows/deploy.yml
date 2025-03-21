@@ -24,8 +24,8 @@ jobs:
           # 최신 Docker 이미지 태그 설정
           IMAGE_NAME=ghcr.io/${{ secrets.GHCR_OWNER }}/chalcak-be-container:latest
           
-          # Docker 이미지 빌드
-          docker build -t $IMAGE_NAME .
+          # Docker 이미지 빌드 (chalcak 폴더에서 실행)
+          docker build -t $IMAGE_NAME ./chalcak
 
           # GHCR에 Docker 이미지 푸시
           docker push $IMAGE_NAME
