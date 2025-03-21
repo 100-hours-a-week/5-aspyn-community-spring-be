@@ -52,13 +52,13 @@ jobs:
 
       # GHCR에서 최신 Docker 이미지를 가져옴
       - name: Pull latest Docker image
-        run: docker pull ghcr.io/${{ secrets.GHCR_OWNER }}/backend:latest
+        run: docker pull ghcr.io/${{ secrets.GHCR_OWNER }}/chalcak-be-container:latest
 
       - name: Stop and remove old container
         run: |
-          docker-compose -f /home/ubuntu/docker-compose.yml down # 기존 컨테이너 중지
-          docker rmi $(docker images -q ghcr.io/${{ secrets.GHCR_OWNER }}/backend) # 기존 이미지 삭제
+          docker-compose -f /home/ubuntu/chalcak/be/docker-compose.yml down # 기존 컨테이너 중지
+          docker rmi $(docker images -q ghcr.io/${{ secrets.GHCR_OWNER }}/chalcak-be-container) # 기존 이미지 삭제
 
       # 새로운 컨테이너 실행
       - name: Run new container
-        run: docker-compose -f /home/ubuntu/docker-compose.yml up -d
+        run: docker-compose -f /home/ubuntu/chalcak/be/docker-compose.yml up -d
