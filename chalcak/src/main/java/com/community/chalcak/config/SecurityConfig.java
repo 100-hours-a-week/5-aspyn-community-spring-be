@@ -84,7 +84,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll() // 스웨거 경로 허용
-                        .requestMatchers("/login", "/", "/api/user/join").permitAll()
+                        .requestMatchers("/login", "/", "/api/user/join","/api/login").permitAll()
                         .anyRequest().authenticated());
 
         http
